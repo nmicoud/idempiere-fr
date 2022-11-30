@@ -15,7 +15,7 @@
 	<import value="net.sf.jasperreports.engine.data.*"/>
 	<parameter name="AD_PINSTANCE_ID" class="java.lang.Integer"/>
 	<queryString>
-		<![CDATA[SELECT AmtAcctDr, AmtAcctCr, GL_Category_ID, IsSummary, PrintName, ClientName, OrgName, Title, XXA_DateAsString, AccountValue, Account_Name
+		<![CDATA[SELECT AmtAcctDr, AmtAcctCr, GL_Category_ID, IsSummary, PrintName, ClientName, OrgName, Title, LFR_DateAsString, AccountValue, Account_Name
 FROM T_LFR_Report
 WHERE AD_PInstance_ID = $P{AD_PINSTANCE_ID}
 ORDER BY Line]]>
@@ -28,7 +28,7 @@ ORDER BY Line]]>
 	<field name="CLIENTNAME" class="java.lang.String"/>
 	<field name="ORGNAME" class="java.lang.String"/>
 	<field name="TITLE" class="java.lang.String"/>
-	<field name="XXA_DATEASSTRING" class="java.lang.String"/>
+	<field name="LFR_DATEASSTRING" class="java.lang.String"/>
 	<field name="ACCOUNTVALUE" class="java.lang.String"/>
 	<field name="ACCOUNT_NAME" class="java.lang.String"/>
 	<variable name="JournalTotalDebit" class="java.math.BigDecimal" calculation="Sum">
@@ -129,14 +129,14 @@ ORDER BY Line]]>
 				<textElement>
 					<font fontName="DejaVu Sans" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{XXA_DATEASSTRING}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{LFR_DATEASSTRING}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
 	<columnHeader>
 		<band height="15" splitType="Stretch">
-			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement key="textField-58" x="116" y="0" width="180" height="15" uuid="da43e999-545a-4dd8-b6bd-20ff0b359a7e"/>
+			<staticText>
+				<reportElement key="textField-58" x="116" y="0" width="180" height="15" uuid="280d034d-10d3-446a-9c3d-965af7675b49"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -146,10 +146,10 @@ ORDER BY Line]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[Libellé]]></textFieldExpression>
-			</textField>
-			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement key="textField-58" x="296" y="0" width="68" height="15" uuid="da43e999-545a-4dd8-b6bd-20ff0b359a7e"/>
+				<text><![CDATA[Libellé]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="textField-58" x="296" y="0" width="68" height="15" uuid="6c1556a8-8917-44e1-a101-e5f38b3bb59d"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -159,10 +159,10 @@ ORDER BY Line]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[Débit]]></textFieldExpression>
-			</textField>
-			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement key="textField-58" x="364" y="0" width="68" height="15" uuid="da43e999-545a-4dd8-b6bd-20ff0b359a7e"/>
+				<text><![CDATA[Débit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="textField-58" x="364" y="0" width="68" height="15" uuid="4f47ac69-d3c3-4dcb-a08b-fabd2e289c9d"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -172,8 +172,8 @@ ORDER BY Line]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[Crédit]]></textFieldExpression>
-			</textField>
+				<text><![CDATA[Crédit]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>

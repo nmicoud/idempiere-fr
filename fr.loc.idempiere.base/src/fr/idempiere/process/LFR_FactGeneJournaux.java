@@ -135,7 +135,7 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 		}
 
 		//Sélection des GL_Cat concernés par l'édition
-		StringBuilder sql1 = new StringBuilder("SELECT DISTINCT fa.GL_Category_ID, gl.Code")
+		StringBuilder sql1 = new StringBuilder("SELECT DISTINCT fa.GL_Category_ID, gl.Value")
 				.append(" FROM Fact_Acct fa")
 				.append(" INNER JOIN GL_Category gl ON (fa.GL_Category_ID = gl.GL_Category_ID)")
 				.append(" WHERE fa.C_AcctSchema_ID = ").append(p_C_AcctSchema_ID)
@@ -148,15 +148,15 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 			sql1.append(" AND fa.DateAcct <= ").append(DB.TO_DATE(p_DateAcct_To, true));
 		if (p_GL_Category_ID > 0) // si sélection d'un seul journal
 			sql1.append(" AND fa.GL_Category_ID = ").append(p_GL_Category_ID);
-		sql1.append(" ORDER BY gl.Code");
+		sql1.append(" ORDER BY gl.Value");
 
 		int[] glCatIDs = DB.getIDsEx(get_TrxName(), sql1.toString());
 
 		for (int glCatID : glCatIDs) {
 			MGLCategory gl = MGLCategory.get(getCtx(), glCatID);
 			statusUpdate(gl.getName());
-			String affich = Util.isEmpty(gl.get_ValueAsString("PrintName")) ? gl.getName() : gl.get_ValueAsString("PrintName");
-			String code = gl.get_ValueAsString("Code");
+			String affich = Util.isEmpty(gl.get_ValueAsString("PrintName")) ? gl.getName() : gl.get_ValueAsString("PrintName");  // TODO IDEMPIERE-5505
+			String code = gl.get_ValueAsString("Value"); // TODO IDEMPIERE-5505
 
 			MTLFRReport taf = null;
 			String printName = "";
