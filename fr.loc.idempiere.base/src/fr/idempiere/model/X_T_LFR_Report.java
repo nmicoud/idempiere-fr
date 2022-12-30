@@ -34,7 +34,7 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20221130L;
+	private static final long serialVersionUID = 20221230L;
 
     /** Standard Constructor */
     public X_T_LFR_Report (Properties ctx, int T_LFR_Report_ID, String trxName)
@@ -143,6 +143,25 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 		return ii.intValue();
 	}
 
+	/** Set Accounted Amount.
+		@param AmtAcct Amount Balance in Currency of Accounting Schema
+	*/
+	public void setAmtAcct (BigDecimal AmtAcct)
+	{
+		set_ValueNoCheck (COLUMNNAME_AmtAcct, AmtAcct);
+	}
+
+	/** Get Accounted Amount.
+		@return Amount Balance in Currency of Accounting Schema
+	  */
+	public BigDecimal getAmtAcct()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_AmtAcct);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
 	/** Set Accounted Credit.
 		@param AmtAcctCr Accounted Credit Amount
 	*/
@@ -194,6 +213,34 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 	public String getBPName()
 	{
 		return (String)get_Value(COLUMNNAME_BPName);
+	}
+
+	public org.compiere.model.I_C_ElementValue getC_ElementValue() throws RuntimeException
+	{
+		return (org.compiere.model.I_C_ElementValue)MTable.get(getCtx(), org.compiere.model.I_C_ElementValue.Table_ID)
+			.getPO(getC_ElementValue_ID(), get_TrxName());
+	}
+
+	/** Set Account Element.
+		@param C_ElementValue_ID Account Element
+	*/
+	public void setC_ElementValue_ID (int C_ElementValue_ID)
+	{
+		if (C_ElementValue_ID < 1)
+			set_Value (COLUMNNAME_C_ElementValue_ID, null);
+		else
+			set_Value (COLUMNNAME_C_ElementValue_ID, Integer.valueOf(C_ElementValue_ID));
+	}
+
+	/** Get Account Element.
+		@return Account Element
+	  */
+	public int getC_ElementValue_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_ElementValue_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set Tenant Name.
@@ -335,6 +382,120 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 			return "Y".equals(oo);
 		}
 		return false;
+	}
+
+	/** Set LFR_AmtAcctPrec.
+		@param LFR_AmtAcctPrec LFR_AmtAcctPrec
+	*/
+	public void setLFR_AmtAcctPrec (BigDecimal LFR_AmtAcctPrec)
+	{
+		set_Value (COLUMNNAME_LFR_AmtAcctPrec, LFR_AmtAcctPrec);
+	}
+
+	/** Get LFR_AmtAcctPrec.
+		@return LFR_AmtAcctPrec	  */
+	public BigDecimal getLFR_AmtAcctPrec()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtAcctPrec);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_AmtAcctPrecCr.
+		@param LFR_AmtAcctPrecCr LFR_AmtAcctPrecCr
+	*/
+	public void setLFR_AmtAcctPrecCr (BigDecimal LFR_AmtAcctPrecCr)
+	{
+		set_Value (COLUMNNAME_LFR_AmtAcctPrecCr, LFR_AmtAcctPrecCr);
+	}
+
+	/** Get LFR_AmtAcctPrecCr.
+		@return LFR_AmtAcctPrecCr	  */
+	public BigDecimal getLFR_AmtAcctPrecCr()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtAcctPrecCr);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_AmtAcctPrecDr.
+		@param LFR_AmtAcctPrecDr LFR_AmtAcctPrecDr
+	*/
+	public void setLFR_AmtAcctPrecDr (BigDecimal LFR_AmtAcctPrecDr)
+	{
+		set_Value (COLUMNNAME_LFR_AmtAcctPrecDr, LFR_AmtAcctPrecDr);
+	}
+
+	/** Get LFR_AmtAcctPrecDr.
+		@return LFR_AmtAcctPrecDr	  */
+	public BigDecimal getLFR_AmtAcctPrecDr()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtAcctPrecDr);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_BalanceGeneRegrLevel.
+		@param LFR_BalanceGeneRegrLevel LFR_BalanceGeneRegrLevel
+	*/
+	public void setLFR_BalanceGeneRegrLevel (String LFR_BalanceGeneRegrLevel)
+	{
+		set_Value (COLUMNNAME_LFR_BalanceGeneRegrLevel, LFR_BalanceGeneRegrLevel);
+	}
+
+	/** Get LFR_BalanceGeneRegrLevel.
+		@return LFR_BalanceGeneRegrLevel	  */
+	public String getLFR_BalanceGeneRegrLevel()
+	{
+		return (String)get_Value(COLUMNNAME_LFR_BalanceGeneRegrLevel);
+	}
+
+	/** Set LFR_CL1.
+		@param LFR_CL1 LFR_CL1
+	*/
+	public void setLFR_CL1 (String LFR_CL1)
+	{
+		set_Value (COLUMNNAME_LFR_CL1, LFR_CL1);
+	}
+
+	/** Get LFR_CL1.
+		@return LFR_CL1	  */
+	public String getLFR_CL1()
+	{
+		return (String)get_Value(COLUMNNAME_LFR_CL1);
+	}
+
+	/** Set LFR_CL2.
+		@param LFR_CL2 LFR_CL2
+	*/
+	public void setLFR_CL2 (String LFR_CL2)
+	{
+		set_Value (COLUMNNAME_LFR_CL2, LFR_CL2);
+	}
+
+	/** Get LFR_CL2.
+		@return LFR_CL2	  */
+	public String getLFR_CL2()
+	{
+		return (String)get_Value(COLUMNNAME_LFR_CL2);
+	}
+
+	/** Set LFR_CL3.
+		@param LFR_CL3 LFR_CL3
+	*/
+	public void setLFR_CL3 (String LFR_CL3)
+	{
+		set_Value (COLUMNNAME_LFR_CL3, LFR_CL3);
+	}
+
+	/** Get LFR_CL3.
+		@return LFR_CL3	  */
+	public String getLFR_CL3()
+	{
+		return (String)get_Value(COLUMNNAME_LFR_CL3);
 	}
 
 	/** Set LFR_DateAsString.
