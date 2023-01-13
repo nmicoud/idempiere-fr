@@ -27,6 +27,7 @@ package fr.idempiere.process;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -41,10 +42,8 @@ import fr.idempiere.model.MTLFRReport;
 
 /**
  *	Process de préparation de la balance générale
- *  @author Nico
+ *  @author Nicolas Micoud - TGI
  */
-
-// TODO reprendre les sql proprement
 
 public class LFR_FactGeneBalance extends LfrProcess {
 
@@ -110,28 +109,45 @@ public class LFR_FactGeneBalance extends LfrProcess {
 		// on ajoute un tiret pour séparer les plages de date ; ce tiret est utilisé dans l'état Jasper
 		String criteresDate = MTLFRReport.getDateCriteres(getCtx(), getAD_Client_ID(), p_dateAcctPrecFrom, p_dateAcctPrecTo) + "-" + MTLFRReport.getDateCriteres(getCtx(), getAD_Client_ID(), p_dateAcctFrom, p_dateAcctTo);
 
-		String sqlWhere = "";
+		StringBuilder sqlOrg = new StringBuilder("");
 		if (p_orgID > 0) {
 			orgName = MOrg.get(getCtx(), p_orgID).getName();	
-			sqlWhere += " AND fa.AD_Org_ID = " + p_orgID + " ";
+			sqlOrg = new StringBuilder(" AND fa.AD_Org_ID = ?");
 		}
 
-		//Sélection des comptes concernés par l'édition
-		StringBuilder sql1 = new StringBuilder("SELECT DISTINCT fa.Account_ID, fa.AccountValue FROM RV_Fact_Acct fa")
-		.append(" WHERE fa.C_AcctSchema_ID = ").append(p_acctSchema_ID)
-		.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_postingType))
-		.append(sqlWhere)
-		.append(" AND fa.DateAcct >= ").append(DB.TO_DATE(p_dateAcctPrecFrom))
-		.append(" AND fa.DateAcct <= ").append(DB.TO_DATE(p_dateAcctTo));
+		// Sélection des comptes concernés par l'édition
+		ArrayList<Object> params = new ArrayList<Object>();
+		ArrayList<Object> params2 = new ArrayList<Object>();
 
-		if (p_accountFromID > 0)
-			sql1.append(" AND fa.AccountValue >= (SELECT Value FROM C_ElementValue WHERE C_ElementValue_ID = " + p_accountFromID + ") ");
-		if (p_accountToID > 0)
-			sql1.append(" AND fa.AccountValue <= (SELECT Value FROM C_ElementValue WHERE C_ElementValue_ID = " + p_accountToID + ") ");
+		StringBuilder sql1 = new StringBuilder("SELECT DISTINCT fa.Account_ID, fa.AccountValue FROM RV_Fact_Acct fa")
+				.append(" WHERE fa.C_AcctSchema_ID = ?")
+				.append(" AND fa.PostingType = ?")
+				.append(" AND fa.DateAcct >= ?")
+				.append(" AND fa.DateAcct <= ?");
+
+		params.add(p_acctSchema_ID);
+		params.add(p_postingType);
+		params.add(p_dateAcctPrecFrom);
+		params.add(p_dateAcctTo);
+
+		if (p_orgID > 0) {
+			sql1.append(sqlOrg);
+			params2.add(p_orgID);
+		}
+
+		if (p_accountFromID > 0) {
+			sql1.append(" AND fa.AccountValue >= (SELECT Value FROM C_ElementValue WHERE C_ElementValue_ID = ?)");
+			params2.add(p_accountFromID);
+		}
+
+		if (p_accountToID > 0) {
+			sql1.append(" AND fa.AccountValue <= (SELECT Value FROM C_ElementValue WHERE C_ElementValue_ID = ?)");
+			params2.add(p_accountToID);
+		}
 
 		sql1.append(" ORDER BY fa.AccountValue");
 
-		for (int accountID : DB.getIDsEx(get_TrxName(), sql1.toString())) {
+		for (int accountID : DB.getIDsEx(get_TrxName(), sql1.toString(), joinParams(params, params2))) {
 			MElementValue ev = new MElementValue (getCtx(), accountID, get_TrxName());
 			String accountValue = ev.getValue();
 
@@ -155,18 +171,32 @@ public class LFR_FactGeneBalance extends LfrProcess {
 				taf.setLFR_BalanceGeneRegrLevel(p_balanceGeneRegrLevel);
 
 			// Montants
-			String sql2 = "SELECT SUM(fa.AmtAcctDr), SUM(fa.AmtAcctCr), SUM(fa.AmtAcctDr)-SUM(fa.AmtAcctCr)"
-					+ " FROM RV_Fact_Acct fa"
-					+ " WHERE fa.C_AcctSchema_ID = " + p_acctSchema_ID
-					+ " AND fa.PostingType = " + DB.TO_STRING(p_postingType)
-					+ " AND fa.Account_ID = " + accountID
-					+ sqlWhere
-					+ " AND fa.DateAcct >= ?"
-					+ " AND fa.DateAcct <= ?"
-					+ " GROUP BY fa.Account_ID";
+			StringBuilder sql2 = new StringBuilder("SELECT SUM(fa.AmtAcctDr), SUM(fa.AmtAcctCr), SUM(fa.AmtAcctDr)-SUM(fa.AmtAcctCr)")
+					.append(" FROM RV_Fact_Acct fa")
+					.append(" WHERE fa.C_AcctSchema_ID = ?")
+					.append(" AND fa.PostingType = ?")
+					.append(" AND fa.Account_ID = ?");
+
+			params.clear();
+			params2.clear();
+			params.add(p_acctSchema_ID);
+			params.add(p_postingType);
+			params.add(accountID);
+
+			if (p_orgID > 0) {
+				sql2.append(sqlOrg);
+				params.add(p_orgID);
+			}
+
+			sql2.append(" AND fa.DateAcct >= ?")
+			.append(" AND fa.DateAcct <= ?")
+			.append(" GROUP BY fa.Account_ID");
+
+			params2.add(p_dateAcctPrecFrom);
+			params2.add(p_dateAcctPrecTo);
 
 			// Calcul D/C/S N-1
-			List<List<Object>> rows = DB.getSQLArrayObjectsEx(get_TrxName(), sql2, p_dateAcctPrecFrom, p_dateAcctPrecTo);
+			List<List<Object>> rows = DB.getSQLArrayObjectsEx(get_TrxName(), sql2.toString(), joinParams(params, params2));
 			if (rows != null && rows.size() > 0) {
 				for (List<Object> row : rows) {
 					taf.setLFR_AmtAcctPrecDr((BigDecimal) row.get(0));
@@ -175,8 +205,12 @@ public class LFR_FactGeneBalance extends LfrProcess {
 				}
 			}
 
+			params2.clear();
+			params2.add(p_dateAcctFrom);
+			params2.add(p_dateAcctTo);
+
 			// Calcul D/C/S N
-			rows = DB.getSQLArrayObjectsEx(get_TrxName(), sql2, p_dateAcctFrom, p_dateAcctTo);
+			rows = DB.getSQLArrayObjectsEx(get_TrxName(), sql2.toString(), joinParams(params, params2));
 			if (rows != null && rows.size() > 0) {
 				for (List<Object> row : rows) {
 					taf.setAmtAcctDr((BigDecimal) row.get(0));
@@ -193,5 +227,12 @@ public class LFR_FactGeneBalance extends LfrProcess {
 
 		return "@ProcessOK@";
 	}	//	doIt
+
+	private Object[] joinParams(ArrayList<Object> params, ArrayList<Object> params2) {
+		ArrayList<Object> retValue = new ArrayList<Object>();
+		retValue.addAll(params);
+		retValue.addAll(params2);
+		return retValue.toArray();
+	}
 
 }	//	LFR_FactGeneBalance
