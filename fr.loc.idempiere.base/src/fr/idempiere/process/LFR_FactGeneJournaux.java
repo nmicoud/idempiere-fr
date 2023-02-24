@@ -295,31 +295,42 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 			if (!isJournalCent) // on remplit la table par du sql
 				lines = lines + DB.executeUpdate(sql2, get_TrxName());
 			else { // journal cent ; la table se remplit en java
-				PreparedStatement pstmt2 = DB.prepareStatement(sql2.toString(), get_TrxName());
-				ResultSet rs2 = pstmt2.executeQuery ();
 
-				while (rs2.next()) {
-					taf = new MTLFRReport(getCtx(), 0, getAD_PInstance_ID(), get_TrxName());
-					taf.setClientName(clientName);
-					taf.setOrgName(orgName);
-					taf.setLine(lines++);
-					if (p_AD_Org_ID > 0)
-						taf.setAD_Org_ID(p_AD_Org_ID);
-					taf.setPrintName(printName);
-					taf.setLFR_DateAsString(criteresDate);
-					taf.setTitle(reportTitle);
-					taf.setFooterCenter(footerCenter);
-					taf.setGL_Category_ID(rs2.getInt(1));
-					taf.setAmtAcctDr(rs2.getBigDecimal(2));
-					taf.setAmtAcctCr(rs2.getBigDecimal(3));
-					taf.setIsSummary(p_isAccountDetail);
-					if (p_isAccountDetail){
-						taf.setAccountValue(rs2.getString(4));
-						taf.setAccount_Name(rs2.getString(5));
-					} 
-					taf.saveEx();
+				PreparedStatement pstmt2 = null;
+				ResultSet rs2 = null;
+
+				try {
+					pstmt2 = DB.prepareStatement(sql2.toString(), get_TrxName());
+					rs2 = pstmt2.executeQuery ();
+
+					while (rs2.next()) {
+						taf = new MTLFRReport(getCtx(), 0, getAD_PInstance_ID(), get_TrxName());
+						taf.setClientName(clientName);
+						taf.setOrgName(orgName);
+						taf.setLine(lines++);
+						if (p_AD_Org_ID > 0)
+							taf.setAD_Org_ID(p_AD_Org_ID);
+						taf.setPrintName(printName);
+						taf.setLFR_DateAsString(criteresDate);
+						taf.setTitle(reportTitle);
+						taf.setFooterCenter(footerCenter);
+						taf.setGL_Category_ID(rs2.getInt(1));
+						taf.setAmtAcctDr(rs2.getBigDecimal(2));
+						taf.setAmtAcctCr(rs2.getBigDecimal(3));
+						taf.setIsSummary(p_isAccountDetail);
+						if (p_isAccountDetail){
+							taf.setAccountValue(rs2.getString(4));
+							taf.setAccount_Name(rs2.getString(5));
+						} 
+						taf.saveEx();
+					}
 				}
-				DB.close(rs2, pstmt2);
+				catch(Exception e) {
+					log.severe("Error while inserting data " + e);
+				}
+				finally {
+					DB.close(rs2, pstmt2);
+				}
 			}
 		}
 
