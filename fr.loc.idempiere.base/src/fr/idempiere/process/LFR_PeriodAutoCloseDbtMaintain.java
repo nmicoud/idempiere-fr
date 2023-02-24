@@ -23,47 +23,57 @@
  * - Nicolas Micoud - TGI                                              *
  **********************************************************************/
 
-package fr.idempiere.model;
+package fr.idempiere.process;
 
-import java.sql.ResultSet;
+import org.compiere.model.MClient;
+import org.compiere.model.MTable;
+import org.compiere.util.Util;
 
-import org.adempiere.base.IModelFactory;
-import org.compiere.model.PO;
-import org.compiere.util.Env;
+import fr.idempiere.model.MLFRPeriodAutoCloseDBT;
 
-public class LFR_ModelFactory implements IModelFactory {
+/**
+ *	Process d'initialisation de la table LFR_PeriodAutoCloseDBT
+ *  @author Nicolas Micoud - TGI
+ */
 
-	@Override
-	public Class<?> getClass(String tableName) {
+public class LFR_PeriodAutoCloseDbtMaintain extends LfrProcess {
 
-		if (MLFRPeriodAutoCloseDBT.Table_Name.equals(tableName))
-			return MLFRPeriodAutoCloseDBT.class;
-		if (MTLFRReport.Table_Name.equals(tableName))
-			return MTLFRReport.class;
+	/**
+	 *  Prepare - e.g., get Parameters.
+	 */
+	protected void prepare()
+	{
+	}	//	prepare
 
-		return null;
+	/**
+	 * 	Execute
+	 *	@return message
+	 *	@throws Exception
+	 */
+	protected String doIt () throws Exception
+	{
+		if (getAD_Client_ID() > 0)
+			return "@ProcessOK@ " + process(getAD_Client_ID());
+		else {
+
+			StringBuilder retValue = new StringBuilder();
+			for (MClient client : MClient.getAll(getCtx(), "AD_Client_ID")) {
+				if (client.getAD_Client_ID() > MTable.MAX_OFFICIAL_ID)
+					retValue.append(" ").append(client.getName()).append(": ").append(process(client.getAD_Client_ID()));
+			}
+
+			return "@ProcessOK@ " + retValue;
+		}
+	}	//	doIt
+
+	private String process(int clientID) {
+
+		String err = MLFRPeriodAutoCloseDBT.initData(getCtx(), clientID, get_TrxName());
+		if (Util.isEmpty(err))
+			return "OK";
+		else
+			return err;
 	}
 
-	@Override
-	public PO getPO(String tableName, int Record_ID, String trxName) {
 
-		if (tableName.equals(MLFRPeriodAutoCloseDBT.Table_Name))
-			return new MLFRPeriodAutoCloseDBT(Env.getCtx(), Record_ID, trxName);
-		if (tableName.equals(MTLFRReport.Table_Name))
-			return new MTLFRReport(Env.getCtx(), Record_ID, trxName);
-
-		return null;
-	}
-
-	@Override
-	public PO getPO(String tableName, ResultSet rs, String trxName) {
-
-		if (MLFRPeriodAutoCloseDBT.Table_Name.equals(tableName))
-			return new MLFRPeriodAutoCloseDBT(Env.getCtx(), rs, trxName);
-		if (MTLFRReport.Table_Name.equals(tableName))
-			return new MTLFRReport(Env.getCtx(), rs, trxName);
-
-		return null;
-	}
-
-}
+}	//	LFR_PeriodAutoCloseDbtMaintain

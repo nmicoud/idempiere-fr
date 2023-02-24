@@ -22,48 +22,17 @@
  * Contributors:                                                       *
  * - Nicolas Micoud - TGI                                              *
  **********************************************************************/
-
 package fr.idempiere.model;
 
-import java.sql.ResultSet;
 
-import org.adempiere.base.IModelFactory;
-import org.compiere.model.PO;
-import org.compiere.util.Env;
+/**
+ *  List all hardcoded ID used in the code
+ *  @author Nicolas Micoud - TGI
+ */
 
-public class LFR_ModelFactory implements IModelFactory {
+public class SystemIDs_LFR {
 
-	@Override
-	public Class<?> getClass(String tableName) {
-
-		if (MLFRPeriodAutoCloseDBT.Table_Name.equals(tableName))
-			return MLFRPeriodAutoCloseDBT.class;
-		if (MTLFRReport.Table_Name.equals(tableName))
-			return MTLFRReport.class;
-
-		return null;
-	}
-
-	@Override
-	public PO getPO(String tableName, int Record_ID, String trxName) {
-
-		if (tableName.equals(MLFRPeriodAutoCloseDBT.Table_Name))
-			return new MLFRPeriodAutoCloseDBT(Env.getCtx(), Record_ID, trxName);
-		if (tableName.equals(MTLFRReport.Table_Name))
-			return new MTLFRReport(Env.getCtx(), Record_ID, trxName);
-
-		return null;
-	}
-
-	@Override
-	public PO getPO(String tableName, ResultSet rs, String trxName) {
-
-		if (MLFRPeriodAutoCloseDBT.Table_Name.equals(tableName))
-			return new MLFRPeriodAutoCloseDBT(Env.getCtx(), rs, trxName);
-		if (MTLFRReport.Table_Name.equals(tableName))
-			return new MTLFRReport(Env.getCtx(), rs, trxName);
-
-		return null;
-	}
+	// System Configurator
+	public final static String LFR_PERIOD_AUTO_CLOSE_DOCBASETYPE_DAYS = "LFR_PERIOD_AUTO_CLOSE_DOCBASETYPE_DAYS";
 
 }
