@@ -13,6 +13,7 @@ Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
 Export-Package: fr.idempiere.model,
  fr.idempiere.process,
  fr.idempiere.util
+Import-Package: org.osgi.service.event;version="1.4.1"
 Service-Component: OSGI-INF/*.xml
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version>=11))"
 Bundle-Activator: org.adempiere.plugin.utils.Incremental2PackActivator

@@ -22,21 +22,36 @@
  * Contributors:                                                       *
  * - Nicolas Micoud - TGI                                              *
  **********************************************************************/
-package fr.idempiere.model;
+
+package fr.idempiere.event;
+
+import static fr.idempiere.model.SystemIDs_LFR.LFR_IN_USE;
+
+import org.adempiere.base.event.AbstractEventHandler;
+import org.adempiere.base.event.IEventManager;
+import org.adempiere.base.event.IEventTopics;
+import org.adempiere.base.event.LoginEventData;
+import org.compiere.model.MSysConfig;
+import org.compiere.util.Env;
+import org.osgi.service.event.Event;
 
 
-/**
- *  List all hardcoded ID used in the code
- *  @author Nicolas Micoud - TGI
- */
+public class LfrEvents extends AbstractEventHandler {
 
-public class SystemIDs_LFR {
+	@Override
+	protected void initialize() {
+		registerEvent(IEventTopics.AFTER_LOGIN);
+	}
 
-	// System Configurator
-	public final static String LFR_IN_USE = "LFR_IN_USE";
-	public final static String LFR_PERIOD_AUTO_CLOSE_DOCBASETYPE_DAYS = "LFR_PERIOD_AUTO_CLOSE_DOCBASETYPE_DAYS";
+	@Override
+	protected void doHandleEvent(Event event) {
 
-	// Colonnes
-	public static final String C_ACCTSCHEMA_GL_LFR_RAN_BENEFACCT = "LFR_RanBenef_Acct";
-	public static final String C_ACCTSCHEMA_GL_LFR_RAN_PERTEACCT = "LFR_RanPerte_Acct";
+		String topic = event.getTopic();
+
+		if (topic.equals(IEventTopics.AFTER_LOGIN)) {
+			LoginEventData loginData = (LoginEventData) event.getProperty(IEventManager.EVENT_DATA);
+			boolean useLfr = MSysConfig.getBooleanValue(LFR_IN_USE, false, loginData.getAD_Client_ID());
+			Env.setContext(Env.getCtx(), "#LFR", useLfr);
+		}
+	}
 }
