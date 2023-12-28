@@ -1,0 +1,127 @@
+[Account_Value],[Account_Name],[Account_Description],[Account_Type],[Account_Sign],[Account_Document],[Account_Summary],[Default_Account],[Account_Parent]
+1,1- Capitaux,,,,No,Yes,,
+2,2 -Immobilisations,,,,No,Yes,,
+3,3- Stocks en en-cours,,,,No,Yes,,
+4,4-Tiers,,,,No,Yes,,
+5,5- Financiers,,,,No,Yes,,
+6,6- Charges,,,,No,Yes,,
+7,7- Produits,,,,No,Yes,,
+10,Capital et Réserves,,,,No,Yes,,1
+11,Report à nouveau,,,,No,Yes,,1
+12,Résultat de l'exercice,,,,No,Yes,,1
+13,Subventions d'investissement,,,,No,Yes,,1
+14,Provisions Réglementées,,,,No,Yes,,1
+15,Provisions pour risques et charges,,,,No,Yes,,1
+16,Emprunts et Dettes assimilées,,,,No,Yes,,1
+17,Dettes rattachées à des participations,,,,No,Yes,,1
+18,Comptes de liaison...,,,,No,Yes,,1
+20,Immos incorporelles,,,,No,Yes,,2
+21,Immos corporelles,,,,No,Yes,,2
+22,Immos mises en concession,,,,No,Yes,,2
+23,Immos en cours,,,,No,Yes,,2
+25,Parts dans des entreprises liées...,,,,No,Yes,,2
+26,Participations et créances rattachées à des participations,,,,No,Yes,,2
+27,Autres immos financières,,,,No,Yes,,2
+28,Amortissements des immobilisations,,,,No,Yes,,2
+29,Provisions pour dépréciation des immos,,,,No,Yes,,2
+31,Matières premières,,,,No,Yes,,3
+32,Autres approvisionnements,,,,No,Yes,,3
+33,En-cours de production de biens,,,,No,Yes,,3
+34,En-cours de production de services,,,,No,Yes,,3
+35,Stock de produits,,,,No,Yes,,3
+37,Stocks de marchandises,,,,No,Yes,,3
+39,Provisions pour dépréciation des stocks et en-cours,,,,No,Yes,,3
+40,Fournisseurs et comptes rattachés,,,,No,Yes,,4
+41,Clients et comptes rattachés,,,,No,Yes,,4
+42,Personnel et comptes rattachés,,,,No,Yes,,4
+43,Sécurité Sociale et autres organismes sociaux,,,,No,Yes,,4
+44,Etat et autres collectivités publiques,,,,No,Yes,,4
+45,Groupe et Associés,,,,No,Yes,,4
+46,Débiteurs divers et Créditeurs divers,,,,No,Yes,,4
+47,Comptes d'attente,,,,No,Yes,,4
+48,Comptes de régularisation,,,,No,Yes,,4
+49,Provisions pour dépréciation des comptes de tiers,,,,No,Yes,,4
+50,Valeurs Mobilières de Placement,,,,No,Yes,,5
+51,"Banques, ets financiers et assimilés",,,,No,Yes,,5
+52,Instruments de trésorerie,,,,No,Yes,,5
+53,Caisse,,,,No,Yes,,5
+54,Régies d'avances et accréditifs,,,,No,Yes,,5
+58,Virements Internes,,,,No,Yes,,5
+59,Provisions pour dépréciation des comptes financiers,,,,No,Yes,,5
+60,60- Achats,,,,No,Yes,,6
+61,61- Services Exterieurs,,,,No,Yes,,6
+62,62- Autres services exterieurs,,,,No,Yes,,6
+63,63- Impots et Taxes,,,,No,Yes,,6
+64,64- Charges de personnel,,,,No,Yes,,6
+65,65- Autres charges de gestion courante,,,,No,Yes,,6
+66,66- Charges Financières,,,,No,Yes,,6
+67,67- Charges exceptionnelles,,,,No,Yes,,6
+68,"68- Dotations aux Amortissements,  Dépréciations, Provisions",,,,No,Yes,,6
+69,69 - impôts,,,,No,Yes,,6
+70,70- Ventes,,,,No,Yes,,7
+71,Production stockée,,,,No,Yes,,7
+74,Subventions d'exploitation,,,,No,Yes,,7
+75,Autres produits de gestion courante,,,,No,Yes,,7
+76,Produits financiers,,,,No,Yes,,7
+77,Produits exceptionnels,,,,No,Yes,,7
+78,Reprise sur amortissements et provisions,,,,No,Yes,,7
+706,706- Prestations de services,,,,No,Yes,,70
+707,707- Ventes de Marchandises,,,,No,Yes,,70
+708,708- Produits des activités annexes,,,,No,Yes,,70
+709,Rabais Remises et Ristournes accordées,,,,No,Yes,,70
+120001,Résultat de l'exercice (bénéfice),,Liability,,Yes,No,LFR_RanBenef_Acct,12
+129000,Résultat de l'exercice (perte),,Liability,,Yes,No,LFR_RanPerte_Acct,12
+151800,Autres provisions pour risques,,Memo,,Yes,No,COMMITMENTOFFSETSALES_ACCT,15
+311000,Marchandises,,Asset,,Yes,No,P_ASSET_ACCT,31
+341100,Etude en cours E 1,,Asset,,Yes,No,PJ_ASSET_ACCT,34
+341200,Etude en cours E 2,,Asset,,Yes,No,PJ_WIP_ACCT,34
+401100,Fournisseurs - Achats de biens ou de prestations de services,,Liability,,Yes,No,V_LIABILITY_ACCT,40
+401200,Fournisseurs de prestations de services,,Liability,,Yes,No,V_LIABILITY_SERVICES_ACCT,40
+403000,Paiements fournisseurs non affectés,,Liability,,Yes,No,B_PAYMENTSELECT_ACCT,40
+408100,Fournisseurs - FNP,,Liability,,Yes,No,NOTINVOICEDRECEIPTS_ACCT,40
+409100,Fournisseurs - Avances et acomptes versés sur commandes,,Asset,,Yes,No,V_PREPAYMENT_ACCT,40
+411100,Clients - Ventes de biens ou de prestations de services,,Asset,,Yes,No,C_RECEIVABLE_ACCT,51
+411200,Accounts Receivable Services - Trade,,Asset,,Yes,No,C_RECEIVABLE_SERVICES_ACCT,51
+413000,Clients - règlements en attente,,Asset,,Yes,No,B_UNALLOCATEDCASH_ACCT,41
+417000,Créances sur travaux non encore facturables,,Revenue,,Yes,No,UNEARNEDREVENUE_ACCT,41
+419100,Clients - Avances et acomptes re çus sur commandes,,Liability,,Yes,No,C_PREPAYMENT_ACCT,41
+445660,TVA déductible sur autres biens et services,,Asset,,Yes,No,T_CREDIT_ACCT,44
+445710,T.V.A. Collectée,,Liability,,Yes,No,T_DUE_ACCT,44
+455100,Groupe Dettes,,Liability,,Yes,No,INTERCOMPANYDUETO_ACCT,45
+455200,Groupe Créances,,Asset,,Yes,No,INTERCOMPANYDUEFROM_ACCT,45
+470000,Account_Acct,,Expense,,Yes,No,DEFAULT_ACCT,47
+471001,Method Change Variance,,Expense,,Yes,No,P_RATEVARIANCE_ACCT,47
+471002,Average Cost Variance,,Expense,,Yes,No,P_AVERAGECOSTVARIANCE_ACCT,47
+471003,Landed Cost Clearing,,Expense,,Yes,No,P_LANDEDCOSTCLEARING_ACCT,47
+476200,Augmentation des dettes,,Revenue,,Yes,No,UNREALIZEDGAIN_ACCT,47
+477200,Diminution des dettes,,Expense,,Yes,No,UNREALIZEDLOSS_ACCT,47
+511200,Règlements en attente,,Asset,,Yes,No,B_INTRANSIT_ACCT,51
+512000,Banques,,Asset,,Yes,No,B_ASSET_ACCT,51
+531100,Caisse en monnaie nationale,,Asset,,Yes,No,CB_ASSET_ACCT,53
+531200,Caisse en monnaie nationale transfert,,Asset,,Yes,No,CB_CASHTRANSFER_ACCT,53
+601000,Achats stockés,,Memo,,Yes,No,COMMITMENTOFFSET_ACCT,60
+601001,Product Cost Adjustment,,Expense,,Yes,No,P_COSTADJUSTMENT_ACCT,60
+601100,Matière (ou groupe) A,,Expense,,Yes,No,P_COGS_ACCT,60
+601200,Matière (ou groupe) B,,Expense,,Yes,No,PPVOFFSET_ACCT,60
+603100,Variation des stocks de matières premières (et fournitures),,Expense,,Yes,No,P_PURCHASEPRICEVARIANCE_ACCT,60
+603700,Variation des stocks de marchandises,,Expense,,Yes,No,W_DIFFERENCES_ACCT,60
+607100,Marchandise (ou groupe) A,,Expense,,Yes,No,P_EXPENSE_ACCT,60
+607200,Achats de marchandises (Groupe B),,Expense,,Yes,No,P_INVENTORYCLEARING_ACCT,60
+608000,Frais accessoires d'achat,,Expense,,Yes,No,CH_EXPENSE_ACCT,60
+609100,Rabais obtenus sur achats de matières premières,,Expense,,Yes,No,P_TRADEDISCOUNTREC_ACCT,60
+635200,Taxes sur le chiffre d affaires non récupérables,,Expense,,Yes,No,T_EXPENSE_ACCT,63
+658001,Autres charges non-courantes,,Expense,,Yes,No,CB_EXPENSE_ACCT,65
+661600,Intérêts bancaires et sur opérations de financement,,Expense,,Yes,No,B_INTERESTEXP_ACCT,66
+665000,Escomptes accordés,,Revenue,,Yes,No,PAYDISCOUNT_EXP_ACCT,66
+666000,Pertes de change,,Expense,,Yes,No,CURRENCYBALANCING_ACCT,66
+666200,Pertes de change,,Revenue,,Yes,No,REALIZEDGAIN_ACCT,66
+666300,Pertes de change,,Expense,,Yes,No,REALIZEDLOSS_ACCT,66
+671400,Créances devenues irrécouvrables dans l exercice,,Expense,,Yes,No,WRITEOFF_ACCT,67
+671800,Autres charges exceptionnelles sur opérations de gestion,,Expense,,Yes,No,CB_DIFFERENCES_ACCT,67
+678800,Charges exceptionnelles diverses,,Expense,,Yes,No,SUSPENSEBALANCING_ACCT,67
+707000,Marchandise (ou groupe) A,,Revenue,,Yes,No,P_REVENUE_ACCT,70
+709100,Rabais et remises et ristournes accordées par l'entreprise,,Revenue,,Yes,No,P_TRADEDISCOUNTGRANT_ACCT,70
+713100,Variations  des stocks  des  produits en cours,,Expense,,Yes,No,P_INVOICEPRICEVARIANCE_ACCT,71
+758001,Autres produits non courants,,Revenue,,Yes,No,CB_RECEIPT_ACCT,75
+763800,Intérêts bancaires et sur opérations de financement,,Revenue,,Yes,No,B_INTERESTREV_ACCT,76
+765000,Escomptes obtenus,,Expense,,Yes,No,PAYDISCOUNT_REV_ACCT,76
