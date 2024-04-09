@@ -96,7 +96,7 @@ public class LFR_RanPrepa extends LfrProcess {
 			else if (name.equals("C_DocType_ID"))
 				p_docTypeID = para[i].getParameterAsInt();
 
-			else if (name.equals("p_type"))
+			else if (name.equals("Type"))
 				p_type = para[i].getParameterAsString();
 			else if (name.equals("GL_JournalBatch_ID"))
 				p_journalBatchID = para[i].getParameterAsInt();
@@ -168,7 +168,7 @@ public class LFR_RanPrepa extends LfrProcess {
 				insertJournalLines(journal, o.getAD_Org_ID());
 			}	//	for all orgs
 		} else {	// une seule org ou les org regroupées dans un seul journal
-			if (!p_IsJournalPerOrg)
+			if (!p_IsJournalPerOrg && p_orgForJournalID > 0)
 				p_orgID = p_orgForJournalID;	// on utilise l'org définie en paramètre
 
 			MOrg org = new MOrg(getCtx(), p_orgID, get_TrxName());
@@ -181,7 +181,7 @@ public class LFR_RanPrepa extends LfrProcess {
 				journal.saveEx();
 				returnMsg += journal.getDocumentNo() + " / ";
 			}
-			insertJournalLines(journal, p_orgID);			
+			insertJournalLines(journal, p_orgID);
 		}
 
 		if (p_type.equals(TYPE_JOURNAL))
