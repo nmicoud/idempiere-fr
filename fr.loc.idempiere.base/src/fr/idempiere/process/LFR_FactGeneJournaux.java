@@ -154,8 +154,8 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 		for (int glCatID : glCatIDs) {
 			MGLCategory gl = MGLCategory.get(getCtx(), glCatID);
 			statusUpdate(gl.getName());
-			String affich = Util.isEmpty(gl.get_ValueAsString("PrintName")) ? gl.getName() : gl.get_ValueAsString("PrintName");  // TODO IDEMPIERE-5505
-			String code = gl.get_ValueAsString("Value"); // TODO IDEMPIERE-5505
+			String affich = Util.isEmpty(gl.getPrintName()) ? gl.getName() : gl.getPrintName();
+			String code = gl.getValue();
 
 			MTLFRReport taf = null;
 			String printName = "";
