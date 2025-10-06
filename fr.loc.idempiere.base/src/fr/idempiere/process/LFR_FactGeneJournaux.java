@@ -53,7 +53,6 @@ import fr.idempiere.model.MTLFRReport;
  */
 
 
-// TODO : remplacer les String par des StringBuilder
 // TODO : ajouter un param IsJournalCentralisateur
 
 public class LFR_FactGeneJournaux extends LfrProcess {
@@ -128,10 +127,10 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 			footerCenter = Msg.getMsg(getCtx(), "LFR_EcrituresGroupeesParCompte");
 
 		// les paramètres optionnels
-		String sqlWhere = "";
+		StringBuilder sqlWhere = new StringBuilder("");
 		if (p_AD_Org_ID > 0) {
 			orgName = MOrg.get(getCtx(), p_AD_Org_ID).getName();
-			sqlWhere += " AND fa.AD_Org_ID = " + p_AD_Org_ID + " ";
+			sqlWhere.append(" AND fa.AD_Org_ID = " + p_AD_Org_ID);
 		}
 
 		//Sélection des GL_Cat concernés par l'édition
@@ -166,134 +165,136 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 
 			String criteresDate = MTLFRReport.getDateCriteres(getCtx(), getAD_Client_ID(), p_DateAcct_From, p_DateAcct_To);
 
-			String sql2 = "";
+			StringBuilder sql2 = new StringBuilder("");
 			if (!isJournalCent) {
 				reportTitle = Msg.getElement(getCtx(), "GL_Category_ID") + " " + affich + (Util.isEmpty(code) ? "" : " (" + code + ")");
 
-				String s_insert = "INSERT INTO T_LFR_Report "
-						+ "(T_LFR_Report_ID, AD_PInstance_ID, AD_Client_ID, AD_Org_ID, Created, CreatedBy, Updated, UpdatedBy, "
-						+ " Fact_Acct_ID, BPName, AccountValue, GL_Category_ID, AmtAcctDr, AmtAcctCr, DateAcct, Description,"
-						+ " LFR_FactAcctOrg, Account_Name, PrintName, ClientName, OrgName, FooterCenter, Title, LFR_DateAsString/*, XXA_NumEcriture*/)"; // FEC
+				StringBuilder s_insert = new StringBuilder("INSERT INTO T_LFR_Report ")
+						.append("(T_LFR_Report_ID, AD_PInstance_ID, AD_Client_ID, AD_Org_ID, Created, CreatedBy, Updated, UpdatedBy, ")
+						.append(" Fact_Acct_ID, BPName, AccountValue, GL_Category_ID, AmtAcctDr, AmtAcctCr, DateAcct, Description,")
+						.append(" LFR_FactAcctOrg, Account_Name, PrintName, ClientName, OrgName, FooterCenter, Title, LFR_DateAsString/*, XXA_NumEcriture*/)"); // FEC
 
 				if (p_isGroupByRecord) {
 					int dt_bs = MTLFRReport.getDocTypeForBankStatement(getCtx());
 					int dt_a = MTLFRReport.getDocTypeForAllocation(getCtx());
 
-					sql2 = s_insert + " SELECT nextidfunc(" + sequenceID + ",'N'), " + getAD_PInstance_ID() + ", " + getAD_Client_ID() + ", " + (p_AD_Org_ID > 0 ? p_AD_Org_ID : 0) + ", SysDate, 0, SysDate, " + getAD_User_ID() + ", "
-							+ " NULL, RESULT.BPName, RESULT.AccountValue,"
-							+ " RESULT.GL_Category_ID, RESULT.AmtAcctDr, RESULT.AmtAcctCr, RESULT.DateAcct, RESULT.Description,"
-							+ " NULL, RESULT.AccountName, "	// pas d'organisation sur la ligne
-							+ DB.TO_STRING(printName) + ", " + DB.TO_STRING(clientName) + ", " + DB.TO_STRING(orgName) + ", "
-							+ DB.TO_STRING(footerCenter) + ", " + DB.TO_STRING(reportTitle) + ", " + DB.TO_STRING(criteresDate)
+					sql2.append(s_insert).append(" SELECT nextidfunc(" + sequenceID + ",'N'), ").append(getAD_PInstance_ID()).append(", ").append(getAD_Client_ID()).append(", ")
+					.append((p_AD_Org_ID > 0 ? p_AD_Org_ID : 0)).append(", SysDate, 0, SysDate, ").append(getAD_User_ID()).append(", ")
+							.append(" NULL, RESULT.BPName, RESULT.AccountValue,")
+							.append(" RESULT.GL_Category_ID, RESULT.AmtAcctDr, RESULT.AmtAcctCr, RESULT.DateAcct, RESULT.Description,")
+							.append(" NULL, RESULT.AccountName, ")	// pas d'organisation sur la ligne
+							.append(DB.TO_STRING(printName)).append(", ").append(DB.TO_STRING(clientName)).append(", ").append(DB.TO_STRING(orgName)).append(", ")
+							.append(DB.TO_STRING(footerCenter)).append(", ").append(DB.TO_STRING(reportTitle)).append(", ").append(DB.TO_STRING(criteresDate))
 							//+ ", RESULT.XXA_NumEcriture" FEC
 
-							+ " FROM (SELECT bp.Name BPName, ev.Value AccountValue,"
-							+ " fa.GL_Category_ID, SUM(fa.AmtAcctDr) AmtAcctDr, SUM(fa.AmtAcctCr) AmtAcctCr, fa.DateAcct, "
+							.append(" FROM (SELECT bp.Name BPName, ev.Value AccountValue,")
+							.append(" fa.GL_Category_ID, SUM(fa.AmtAcctDr) AmtAcctDr, SUM(fa.AmtAcctCr) AmtAcctCr, fa.DateAcct, ")
 							// DocTypeName et N° doc
-							+ " CASE WHEN fa.AD_Table_ID = 318 THEN dt.PrintName || ' ' || i.DocumentNo"
-							+ " WHEN fa.AD_Table_ID = 335 THEN dt.PrintName || ' ' || p.DocumentNo"
-							+ " WHEN fa.AD_Table_ID = 224 THEN dt.PrintName || ' ' || j.DocumentNo"
-							+ " WHEN fa.AD_Table_ID = 392 THEN dt.PrintName || ' ' || bs.Name"
-							+ " WHEN fa.AD_Table_ID = 735 THEN dt.PrintName || ' ' || a.DocumentNo"
-							+ " END Description,"
-							+ " ev" + (baseLanguage ? "":"t") + ".Name AccountName"	// on vient lire le nom du compte sur la table principale ou la table trl
+							.append(" CASE WHEN fa.AD_Table_ID = 318 THEN dt.PrintName || ' ' || i.DocumentNo")
+							.append(" WHEN fa.AD_Table_ID = 335 THEN dt.PrintName || ' ' || p.DocumentNo")
+							.append(" WHEN fa.AD_Table_ID = 224 THEN dt.PrintName || ' ' || j.DocumentNo")
+							.append(" WHEN fa.AD_Table_ID = 392 THEN dt.PrintName || ' ' || bs.Name")
+							.append(" WHEN fa.AD_Table_ID = 735 THEN dt.PrintName || ' ' || a.DocumentNo")
+							.append(" END Description,")
+							.append(" ev").append(baseLanguage ? "" : "t").append(".Name AccountName")	// on vient lire le nom du compte sur la table principale ou la table trl
 							//+ " COALESCE(fa.XXA_NumEcriture, 0) XXA_NumEcriture" FEC
 
-							+ " FROM Fact_Acct fa"
-							+ " LEFT OUTER JOIN C_Invoice i ON (fa.Record_ID = i.C_Invoice_ID AND fa.AD_Table_ID = 318)"
-							+ " LEFT OUTER JOIN C_Payment p ON (fa.Record_ID = p.C_Payment_ID AND fa.AD_Table_ID = 335)"
-							+ " LEFT OUTER JOIN GL_Journal j ON (fa.Record_ID = j.GL_Journal_ID AND fa.AD_Table_ID = 224)"
-							+ " LEFT OUTER JOIN C_BankStatement bs ON (fa.Record_ID = bs.C_BankStatement_ID AND fa.AD_Table_ID = 392)"
-							+ " LEFT OUTER JOIN C_AllocationHdr a ON (fa.Record_ID = a.C_AllocationHdr_ID AND fa.AD_Table_ID = 735)"
-							+ " LEFT OUTER JOIN C_BPartner bp ON (fa.C_BPartner_ID = bp.C_BPartner_ID AND fa.AD_Table_ID <> 392)," // on ne prend pas en compte le tiers figurant sur le rapprochement bancaire (empêche le group by)
-							+ " AD_Client c, AD_Org o, GL_Category gl, C_ElementValue ev, " + (baseLanguage ? "" : "C_ElementValue_Trl evt, ")
-							+ " C_DocType" + (baseLanguage ? "" : "_Trl ") + " dt"	// soit C_DocType soit C_DocType_Trl
+							.append(" FROM Fact_Acct fa")
+							.append(" LEFT OUTER JOIN C_Invoice i ON (fa.Record_ID = i.C_Invoice_ID AND fa.AD_Table_ID = 318)")
+							.append(" LEFT OUTER JOIN C_Payment p ON (fa.Record_ID = p.C_Payment_ID AND fa.AD_Table_ID = 335)")
+							.append(" LEFT OUTER JOIN GL_Journal j ON (fa.Record_ID = j.GL_Journal_ID AND fa.AD_Table_ID = 224)")
+							.append(" LEFT OUTER JOIN C_BankStatement bs ON (fa.Record_ID = bs.C_BankStatement_ID AND fa.AD_Table_ID = 392)")
+							.append(" LEFT OUTER JOIN C_AllocationHdr a ON (fa.Record_ID = a.C_AllocationHdr_ID AND fa.AD_Table_ID = 735)")
+							.append(" LEFT OUTER JOIN C_BPartner bp ON (fa.C_BPartner_ID = bp.C_BPartner_ID AND fa.AD_Table_ID <> 392),") // on ne prend pas en compte le tiers figurant sur le rapprochement bancaire (empêche le group by)
+							.append(" AD_Client c, AD_Org o, GL_Category gl, C_ElementValue ev, " + (baseLanguage ? "" : "C_ElementValue_Trl evt, "))
+							.append(" C_DocType").append((baseLanguage ? "" : "_Trl ") + " dt")	// soit C_DocType soit C_DocType_Trl
 
-							+ " WHERE fa.AD_Client_ID = c.AD_Client_ID"
-							+ " AND fa.AD_Org_ID = o.AD_Org_ID"
-							+ " AND fa.GL_Category_ID = gl.GL_Category_ID"
-							+ " AND fa.C_AcctSchema_ID = " + p_C_AcctSchema_ID
-							+ " AND fa.Account_ID = ev.C_ElementValue_ID "
-							+ (baseLanguage ? "" : " AND fa.Account_ID = evt.C_ElementValue_ID AND evt.AD_Language=" + DB.TO_STRING(language))
+							.append(" WHERE fa.AD_Client_ID = c.AD_Client_ID")
+							.append(" AND fa.AD_Org_ID = o.AD_Org_ID")
+							.append(" AND fa.GL_Category_ID = gl.GL_Category_ID")
+							.append(" AND fa.C_AcctSchema_ID = ").append(p_C_AcctSchema_ID)
+							.append(" AND fa.Account_ID = ev.C_ElementValue_ID ")
+							.append(baseLanguage ? "" : " AND fa.Account_ID = evt.C_ElementValue_ID AND evt.AD_Language= " + DB.TO_STRING(language))
 							// DocTypeName et N° doc
-							+ " AND ("
-							+ "    (fa.AD_Table_ID = 318 AND dt.C_DocType_ID = i.C_DocType_ID)"
-							+ " OR (fa.AD_Table_ID = 335 AND dt.C_DocType_ID = p.C_DocType_ID)"
-							+ " OR (fa.AD_Table_ID = 224 AND dt.C_DocType_ID = j.C_DocType_ID)"
-							+ " OR (fa.AD_Table_ID = 392 AND dt.C_DocType_ID = " + dt_bs + ")"
-							+ " OR (fa.AD_Table_ID = 735 AND dt.C_DocType_ID = " + dt_a + "))"
-							+ (baseLanguage ? "" : " AND dt.AD_Language=" + DB.TO_STRING(language))
+							.append(" AND (")
+							.append("    (fa.AD_Table_ID = 318 AND dt.C_DocType_ID = i.C_DocType_ID)")
+							.append(" OR (fa.AD_Table_ID = 335 AND dt.C_DocType_ID = p.C_DocType_ID)")
+							.append(" OR (fa.AD_Table_ID = 224 AND dt.C_DocType_ID = j.C_DocType_ID)")
+							.append(" OR (fa.AD_Table_ID = 392 AND dt.C_DocType_ID = " + dt_bs + ")")
+							.append(" OR (fa.AD_Table_ID = 735 AND dt.C_DocType_ID = " + dt_a + "))")
+							.append((baseLanguage ? "" : " AND dt.AD_Language=" + DB.TO_STRING(language)))
 
-							+ " AND fa.PostingType = " + DB.TO_STRING(p_PostingType) + " " + sqlWhere;
+							.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_PostingType)).append(sqlWhere);
 					if (p_DateAcct_From != null)
-						sql2 = sql2 + " AND fa.DateAcct >= " + DB.TO_DATE(p_DateAcct_From, true);
+						sql2.append(" AND fa.DateAcct >= ").append(DB.TO_DATE(p_DateAcct_From, true));
 					if (p_DateAcct_To != null)
-						sql2 = sql2 + " AND fa.DateAcct <= " + DB.TO_DATE(p_DateAcct_To, true);
-					sql2 = sql2 + " AND fa.GL_Category_ID = " + glCatID
-							+ " GROUP BY fa.GL_Category_ID, fa.DateAcct, ev.Value, fa.Account_ID, fa.AD_Table_ID, fa.Record_ID, bp.Name, ev"+(baseLanguage ? "":"t")+".Name, "
-							+ "dt.printname, i.DocumentNo, p.DocumentNo, j.DocumentNo, bs.Name, a.DocumentNo/*, fa.XXA_NumEcriture*/" // FEC
-							+ " ORDER BY fa.DateAcct, fa.Record_ID, ev.Value"
-							+ ") RESULT";
+						sql2.append(" AND fa.DateAcct <= ").append(DB.TO_DATE(p_DateAcct_To, true));
+					sql2.append(" AND fa.GL_Category_ID = " + glCatID)
+					.append(" GROUP BY fa.GL_Category_ID, fa.DateAcct, ev.Value, fa.Account_ID, fa.AD_Table_ID, fa.Record_ID, bp.Name, ev").append((baseLanguage ? "" : "t")) .append(".Name, ")
+					.append("dt.printname, i.DocumentNo, p.DocumentNo, j.DocumentNo, bs.Name, a.DocumentNo/*, fa.XXA_NumEcriture*/") // FEC
+					.append(" ORDER BY fa.DateAcct, fa.Record_ID, ev.Value")
+					.append(") RESULT");
 				} else { // pas de regroupement
-					sql2 = s_insert + " SELECT nextidfunc(" + sequenceID + ",'N'), " + getAD_PInstance_ID() + ", " + getAD_Client_ID() + ", " + (p_AD_Org_ID > 0 ? p_AD_Org_ID : 0) + ", SysDate, 0, SysDate, " + getAD_User_ID() + ", "
-							+ " RESULT.Fact_Acct_ID, RESULT.BPName, RESULT.AccountValue,"
-							+ " RESULT.GL_Category_ID, RESULT.AmtAcctDr, RESULT.AmtAcctCr, RESULT.DateAcct, RESULT.Description,"
-							+ " RESULT.OrgName, RESULT.AccountName, "
-							+ DB.TO_STRING(printName) + ", " + DB.TO_STRING(clientName) + ", " + DB.TO_STRING(orgName) + ", "
-							+ DB.TO_STRING(footerCenter) + ", " + DB.TO_STRING(reportTitle) + ", " + DB.TO_STRING(criteresDate)
+					sql2.append(s_insert).append(" SELECT nextidfunc(" + sequenceID + ",'N'), ").append(getAD_PInstance_ID()).append(", ").append(getAD_Client_ID()).append(", ")
+					.append(p_AD_Org_ID > 0 ? p_AD_Org_ID : 0).append(", SysDate, 0, SysDate, ").append(getAD_User_ID()).append(", ")
+					.append(" RESULT.Fact_Acct_ID, RESULT.BPName, RESULT.AccountValue,")
+					.append(" RESULT.GL_Category_ID, RESULT.AmtAcctDr, RESULT.AmtAcctCr, RESULT.DateAcct, RESULT.Description,")
+					.append(" RESULT.OrgName, RESULT.AccountName, ")
+					.append(DB.TO_STRING(printName)).append(", ").append(DB.TO_STRING(clientName)).append(", ").append(DB.TO_STRING(orgName)).append(", ")
+					.append(DB.TO_STRING(footerCenter)).append(", ").append(DB.TO_STRING(reportTitle)).append(", ").append(DB.TO_STRING(criteresDate))
 							//+ ", RESULT.XXA_NumEcriture " FEC
 
-							+ " FROM (SELECT fa.Fact_Acct_ID, bp.Name BPName, ev.Value AccountValue,"
-							+ " fa.GL_Category_ID, fa.AmtAcctDr, fa.AmtAcctCr, fa.DateAcct, fa.Description,"
-							+ " o.Name OrgName, ev"+(baseLanguage ? "":"t")+".Name AccountName"
+					.append(" FROM (SELECT fa.Fact_Acct_ID, bp.Name BPName, ev.Value AccountValue,")
+					.append(" fa.GL_Category_ID, fa.AmtAcctDr, fa.AmtAcctCr, fa.DateAcct, fa.Description,")
+					.append(" o.Name OrgName, ev").append((baseLanguage ? "" : "t")).append(".Name AccountName")
 							//+ ", COALESCE(fa.XXA_NumEcriture, 0) XXA_NumEcriture" FEC
 
-							+ " FROM Fact_Acct fa"
-							+ " LEFT OUTER JOIN C_BPartner bp ON (fa.C_BPartner_ID = bp.C_BPartner_ID)"
-							+ ", AD_Client c, AD_Org o, GL_Category gl, C_ElementValue ev" + (baseLanguage ? "" : ", C_ElementValue_Trl evt")
-							+ " WHERE fa.AD_Client_ID = c.AD_Client_ID"
-							+ " AND fa.AD_Org_ID = o.AD_Org_ID"
-							+ " AND fa.GL_Category_ID = gl.GL_Category_ID"
-							+ " AND fa.C_AcctSchema_ID = " + p_C_AcctSchema_ID
-							+ " AND fa.Account_ID = ev.C_ElementValue_ID "
-							+ (baseLanguage ? "" : " AND fa.Account_ID = evt.C_ElementValue_ID AND evt.AD_Language=" + DB.TO_STRING(language))
-							+ " AND fa.PostingType = '" + p_PostingType + "' " + sqlWhere;
+					.append(" FROM Fact_Acct fa")
+					.append(" LEFT OUTER JOIN C_BPartner bp ON (fa.C_BPartner_ID = bp.C_BPartner_ID)")
+					.append(", AD_Client c, AD_Org o, GL_Category gl, C_ElementValue ev").append(baseLanguage ? "" : ", C_ElementValue_Trl evt")
+					.append(" WHERE fa.AD_Client_ID = c.AD_Client_ID")
+					.append(" AND fa.AD_Org_ID = o.AD_Org_ID")
+					.append(" AND fa.GL_Category_ID = gl.GL_Category_ID")
+					.append(" AND fa.C_AcctSchema_ID = ").append(p_C_AcctSchema_ID)
+					.append(" AND fa.Account_ID = ev.C_ElementValue_ID ")
+					.append((baseLanguage ? "" : " AND fa.Account_ID = evt.C_ElementValue_ID AND evt.AD_Language=" + DB.TO_STRING(language)))
+					.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_PostingType)).append(sqlWhere);
 					if (p_DateAcct_From != null)
-						sql2 = sql2 + " AND fa.DateAcct >= " + DB.TO_DATE(p_DateAcct_From, true);
+						sql2.append(" AND fa.DateAcct >= " + DB.TO_DATE(p_DateAcct_From, true));
 					if (p_DateAcct_To != null)
-						sql2 = sql2 + " AND fa.DateAcct <= " + DB.TO_DATE(p_DateAcct_To, true);
-					sql2 = sql2 + " AND fa.GL_Category_ID = " + glCatID
-							+ " ORDER BY gl.PrintName, fa.DateAcct NULLS FIRST, fa.Record_ID, ev.Value, fa.Line_ID"
-							+ ") RESULT";
+						sql2.append(" AND fa.DateAcct <= " + DB.TO_DATE(p_DateAcct_To, true));
+					sql2.append(" AND fa.GL_Category_ID = " + glCatID)
+					.append(" ORDER BY gl.PrintName, fa.DateAcct NULLS FIRST, fa.Record_ID, ev.Value, fa.Line_ID")
+							.append(") RESULT");
 				}
 			} else { // journal centralisateur
-				String groupByClause = " GROUP BY fa.GL_Category_ID, gl.PrintName";
+				StringBuilder groupByClause = new StringBuilder(" GROUP BY fa.GL_Category_ID, gl.PrintName");
 				if (p_isAccountDetail)
-					groupByClause += ", fa.Account_ID, fa.AccountValue, fa.Name";
+					groupByClause.append(", fa.Account_ID, fa.AccountValue, fa.Name");
 
-				String orderByClause = " ORDER BY gl.PrintName";
+				StringBuilder orderByClause = new StringBuilder(" ORDER BY gl.PrintName");
 				if (p_isAccountDetail)
-					orderByClause += ", fa.AccountValue";
+					orderByClause.append(", fa.AccountValue");
 
-				sql2 = "SELECT fa.GL_Category_ID, COALESCE(SUM(fa.AmtAcctDr),0), COALESCE(SUM(fa.AmtAcctCr),0)";
+				sql2 = new StringBuilder("SELECT fa.GL_Category_ID, COALESCE(SUM(fa.AmtAcctDr),0), COALESCE(SUM(fa.AmtAcctCr),0)");
 				if (p_isAccountDetail)
-					sql2 += ", fa.AccountValue, fa.Name";
+					sql2.append(", fa.AccountValue, fa.Name");
 
-				sql2 += " FROM RV_Fact_Acct fa, GL_Category gl"
-						+ " WHERE fa.GL_Category_ID = gl.GL_Category_ID"
-						+ " AND fa.C_AcctSchema_ID = " + p_C_AcctSchema_ID 
-						+ " AND fa.PostingType = " + DB.TO_STRING(p_PostingType) + " " + sqlWhere;
+				sql2.append(" FROM RV_Fact_Acct fa, GL_Category gl")
+				.append(" WHERE fa.GL_Category_ID = gl.GL_Category_ID")
+				.append(" AND fa.C_AcctSchema_ID = ").append(p_C_AcctSchema_ID) 
+				.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_PostingType)).append(sqlWhere);
 				if (p_DateAcct_From != null)
-					sql2 = sql2 + " AND fa.DateAcct >= " + DB.TO_DATE(p_DateAcct_From, true);
+					sql2.append(" AND fa.DateAcct >= ").append(DB.TO_DATE(p_DateAcct_From, true));
 				if (p_DateAcct_To != null)
-					sql2 = sql2 + " AND fa.DateAcct <= " + DB.TO_DATE(p_DateAcct_To, true);
-				sql2 = sql2 + " AND fa.GL_Category_ID = " + glCatID
-						+ groupByClause + orderByClause;
+					sql2.append(" AND fa.DateAcct <= ").append(DB.TO_DATE(p_DateAcct_To, true));
+				sql2.append(" AND fa.GL_Category_ID = ").append(glCatID)
+				.append(groupByClause).append(orderByClause);
 			}
 
 			//Spé détail journaux
 			if (!isJournalCent) // on remplit la table par du sql
-				lines = lines + DB.executeUpdate(sql2, get_TrxName());
+				lines = lines + DB.executeUpdate(sql2.toString(), get_TrxName());
 			else { // journal cent ; la table se remplit en java
 
 				PreparedStatement pstmt2 = null;
