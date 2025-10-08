@@ -25,8 +25,6 @@
 
 package fr.idempiere.process;
 
-//import static org.tgi.model.SystemIDs_Tgi.PROCESS_XXA_FACTGENEJOURNALCENT;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -43,7 +41,6 @@ import org.compiere.util.Msg;
 import org.compiere.util.Util;
 
 import fr.idempiere.model.MTLFRReport;
-//import org.tgi.util.Util_Tgi;
 
 
 /**
@@ -51,9 +48,6 @@ import fr.idempiere.model.MTLFRReport;
  *	Les états jrxml lisent ensuite la table pour l'affichage des infos
  *  @author Nico
  */
-
-
-// TODO : ajouter un param IsJournalCentralisateur
 
 public class LFR_FactGeneJournaux extends LfrProcess {
 
@@ -65,7 +59,7 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 	private int			p_GL_Category_ID = 0;
 	private Timestamp	p_DateAcct_From = null;
 	private Timestamp	p_DateAcct_To = null;
-	private boolean		isJournalCent = false;
+	private boolean		p_isJournalCent = false;
 	private boolean		p_isGroupByRecord = false; // Regrouper les écritures par document (journal) - détermine le sql utilisé
 	private boolean		p_isAccountDetail = false; // Afficher par compte (journal centralisateur) - met à jour IsSummary dans T_XXA_Report
 	private String		language = "";
@@ -79,7 +73,9 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 		ProcessInfoParameter[] para = getParameter();
 		for (int i = 0; i < para.length; i++) {
 			String name = para[i].getParameterName();
-			if (name.equals("C_AcctSchema_ID"))
+			if (name.equals("LFR_IsJournalCentralisateur"))
+				p_isJournalCent = para[i].getParameterAsBoolean();
+			else if (name.equals("C_AcctSchema_ID"))
 				p_C_AcctSchema_ID = para[i].getParameterAsInt();
 			else if (name.equals("AD_Org_ID"))
 				p_AD_Org_ID = para[i].getParameterAsInt();
@@ -111,17 +107,11 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 	{
 		String clientName = MClient.get(getCtx(), getAD_Client_ID()).getName();
 		String reportTitle = ""; // le titre de l'état (repris dans le Page Header)
-		int sequenceID = MTLFRReport.getSequenceID(get_TrxName()); // TODO à faire dans le SQL directement
+		int sequenceID = MTLFRReport.getSequenceID(get_TrxName());
 		String footerCenter = "";
 
 		if (language.equals(Language.getBaseAD_Language()))
 			baseLanguage=true;
-
-		// FIXME : remplacer par un nouveau paramètre IsJournalCentralisateur
-		//			if (Util_Tgi.getProcessID(PROCESS_XXA_FACTGENEJOURNALCENT, get_TrxName()) == getProcessInfo().getAD_Process_ID()) {
-		//				isJournalCent = true;
-		//				reportTitle = "Journal Centralisateur"; // translate	
-		//			}
 
 		if (p_isGroupByRecord)
 			footerCenter = Msg.getMsg(getCtx(), "LFR_EcrituresGroupeesParCompte");
@@ -166,7 +156,7 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 			String criteresDate = MTLFRReport.getDateCriteres(getCtx(), getAD_Client_ID(), p_DateAcct_From, p_DateAcct_To);
 
 			StringBuilder sql2 = new StringBuilder("");
-			if (!isJournalCent) {
+			if (!p_isJournalCent) {
 				reportTitle = Msg.getElement(getCtx(), "GL_Category_ID") + " " + affich + (Util.isEmpty(code) ? "" : " (" + code + ")");
 
 				StringBuilder s_insert = new StringBuilder("INSERT INTO T_LFR_Report ")
@@ -268,6 +258,9 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 							.append(") RESULT");
 				}
 			} else { // journal centralisateur
+				
+				reportTitle = "Journal Centralisateur";
+				
 				StringBuilder groupByClause = new StringBuilder(" GROUP BY fa.GL_Category_ID, gl.PrintName");
 				if (p_isAccountDetail)
 					groupByClause.append(", fa.Account_ID, fa.AccountValue, fa.Name");
@@ -293,7 +286,7 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 			}
 
 			//Spé détail journaux
-			if (!isJournalCent) // on remplit la table par du sql
+			if (!p_isJournalCent) // on remplit la table par du sql
 				lines = lines + DB.executeUpdate(sql2.toString(), get_TrxName());
 			else { // journal cent ; la table se remplit en java
 
