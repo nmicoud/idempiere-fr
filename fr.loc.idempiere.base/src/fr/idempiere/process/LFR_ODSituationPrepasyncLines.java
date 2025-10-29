@@ -22,23 +22,46 @@
  * Contributors:                                                       *
  * - Nicolas Micoud - TGI                                              *
  **********************************************************************/
-package fr.idempiere.model;
 
+package fr.idempiere.process;
+
+import java.util.logging.Level;
+
+import org.compiere.process.ProcessInfoParameter;
+import org.compiere.util.DB;
+
+import fr.idempiere.model.MLFRODSituationPrepa;
 
 /**
- *  List all hardcoded ID used in the code
+ *  Process de préparation des OD de situation
  *  @author Nicolas Micoud - TGI
  */
 
-public class SystemIDs_LFR {
+public class LFR_ODSituationPrepasyncLines extends LfrProcess {
 
-	// System Configurator
-	public final static String LFR_IN_USE = "LFR_IN_USE";
-	public final static String LFR_PERIOD_AUTO_CLOSE_DOCBASETYPE_DAYS = "LFR_PERIOD_AUTO_CLOSE_DOCBASETYPE_DAYS";
+	private boolean	p_DeleteOld = true;
 
-	// Colonnes
-	public static final String C_ACCTSCHEMA_GL_LFR_RAN_BENEFACCT = "LFR_RanBenef_Acct";
-	public static final String C_ACCTSCHEMA_GL_LFR_RAN_PERTEACCT = "LFR_RanPerte_Acct";
-	public static final String C_INVOICELINE_LFR_IMPUTATIONDATEDEB = "LFR_ImputationDateDeb";
-	public static final String C_INVOICELINE_LFR_IMPUTATIONDATEFIN = "LFR_ImputationDateFin";
+	@Override
+	protected void prepare() {
+		ProcessInfoParameter[] para = getParameter();
+		for (int i = 0; i < para.length; i++) {
+			String name = para[i].getParameterName();
+			if (para[i].getParameter() == null)
+				;
+			else if (name.equals("DeleteOld"))
+				p_DeleteOld = "Y".equals(para[i].getParameter());
+			else
+				log.log(Level.SEVERE, "Unknown Parameter: " + name);
+		}
+	}
+
+	protected String doIt () throws Exception
+	{
+		MLFRODSituationPrepa sp = new MLFRODSituationPrepa (getCtx(), getRecord_ID(), get_TrxName());
+
+		if (p_DeleteOld)
+			DB.executeUpdateEx("DELETE FROM LFR_ODSituationPrepaLine WHERE LFR_ODSituationPrepa_ID = " + getRecord_ID(), get_TrxName()); // TODO passer par une variable
+
+		return sp.syncLines(false);
+	}
 }

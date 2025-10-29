@@ -36,6 +36,10 @@ public class LFR_ModelFactory implements IModelFactory {
 	@Override
 	public Class<?> getClass(String tableName) {
 
+		if (MLFRODSituationPrepa.Table_Name.equals(tableName))
+			return MLFRODSituationPrepa.class;
+		if (MLFRODSituationPrepaLine.Table_Name.equals(tableName))
+			return MLFRODSituationPrepaLine.class;
 		if (MLFRPeriodAutoCloseDBT.Table_Name.equals(tableName))
 			return MLFRPeriodAutoCloseDBT.class;
 		if (MTLFRReport.Table_Name.equals(tableName))
@@ -47,6 +51,10 @@ public class LFR_ModelFactory implements IModelFactory {
 	@Override
 	public PO getPO(String tableName, int Record_ID, String trxName) {
 
+		if (tableName.equals(MLFRODSituationPrepa.Table_Name))
+			return new MLFRODSituationPrepa(Env.getCtx(), Record_ID, trxName);
+		if (tableName.equals(MLFRODSituationPrepaLine.Table_Name))
+			return new MLFRODSituationPrepaLine(Env.getCtx(), Record_ID, trxName);
 		if (tableName.equals(MLFRPeriodAutoCloseDBT.Table_Name))
 			return new MLFRPeriodAutoCloseDBT(Env.getCtx(), Record_ID, trxName);
 		if (tableName.equals(MTLFRReport.Table_Name))
@@ -58,6 +66,10 @@ public class LFR_ModelFactory implements IModelFactory {
 	@Override
 	public PO getPO(String tableName, ResultSet rs, String trxName) {
 
+		if (MLFRODSituationPrepa.Table_Name.equals(tableName))
+			return new MLFRODSituationPrepa(Env.getCtx(), rs, trxName);
+		if (MLFRODSituationPrepaLine.Table_Name.equals(tableName))
+			return new MLFRODSituationPrepaLine(Env.getCtx(), rs, trxName);
 		if (MLFRPeriodAutoCloseDBT.Table_Name.equals(tableName))
 			return new MLFRPeriodAutoCloseDBT(Env.getCtx(), rs, trxName);
 		if (MTLFRReport.Table_Name.equals(tableName))
