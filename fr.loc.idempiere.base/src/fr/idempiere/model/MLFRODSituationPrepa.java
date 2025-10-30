@@ -25,6 +25,9 @@
 
 package fr.idempiere.model;
 
+import static fr.idempiere.model.SystemIDs_LFR.C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CAPACCT;
+import static fr.idempiere.model.SystemIDs_LFR.C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CCAACCT;
+import static fr.idempiere.model.SystemIDs_LFR.C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_TCAPACCT;
 import static fr.idempiere.model.SystemIDs_LFR.C_INVOICELINE_LFR_IMPUTATIONDATEDEB;
 import static fr.idempiere.model.SystemIDs_LFR.C_INVOICELINE_LFR_IMPUTATIONDATEFIN;
 
@@ -562,7 +565,7 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 
 			// écriture équilibre
 			MJournalLine line = new MJournalLine (jCCA);
-			line.setC_ValidCombination_ID(asGL.get_ValueAsInt("XXA_ODSituationPrepaCCA_Acct")); // TODO utiliser des constantes et pas de combinaison
+			line.setC_ValidCombination_ID(asGL.get_ValueAsInt(C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CCAACCT));
 
 			String sql = "SELECT SUM(AmtSourceDR) - SUM(AmtSourceCr) FROM GL_JournalLine WHERE GL_Journal_ID = ?";
 			BigDecimal amt = DB.getSQLValueBDEx(get_TrxName(), sql, jCCA.getGL_Journal_ID());
@@ -617,32 +620,26 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 
 			for (int i = 0; i < lines.length; i++) { // pour une ligne CAP, 3 lignes d'OD : HT, TVA, frs
 				MLFRODSituationPrepaLine fromLine = lines[i];
-				//				if (fromLine.getType().equals(X_XXA_ODSituationPrepaLine.TYPE_CAP)) {
+
 				//	HT
 				MJournalLine line = new MJournalLine (jCAP);
 				updateJournalLine(line, fromLine, as.getC_AcctSchema_ID());
 				line.saveEx();
 
 				//	TVA
+				MAccount combi = new MAccount(getCtx(), asGL.get_ValueAsInt(C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_TCAPACCT), get_TrxName());
 				MJournalLine lineTVA = new MJournalLine (jCAP);
 				lineTVA.setAD_Org_ID(fromLine.getAD_OrgDoc_ID());
 				lineTVA.setDescription(fromLine.getLineDescription());
-
-				//	recupérer le account_id de la combinaison XXA_ODSituationPrepaTCAP_Acct
-				MAccount combi = new MAccount(getCtx(), asGL.get_ValueAsInt("XXA_ODSituationPrepaTCAP_Acct"), get_TrxName()); // TODO utiliser des constantes et pas de combinaison
-
 				lineTVA.setAD_Org_ID(fromLine.getAD_OrgDoc_ID());
 				lineTVA.setAccount_ID(combi.getAccount_ID());
 				lineTVA.setC_BPartner_ID(line.getC_BPartner_ID());
 
 				//	Frs
+				combi = new MAccount(getCtx(), asGL.get_ValueAsInt(C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CAPACCT), get_TrxName());
 				MJournalLine lineFrs = new MJournalLine (jCAP);
 				lineFrs.setAD_Org_ID(fromLine.getAD_OrgDoc_ID());
 				lineFrs.setDescription(fromLine.getLineDescription());
-
-				//	recupérer le account_id de la combinaison XXA_ODSituationPrepaTCAP_Acct
-				combi = new MAccount(getCtx(), asGL.get_ValueAsInt("XXA_ODSituationPrepaCAP_Acct"), get_TrxName()); // TODO utiliser des constantes et pas de combinaison
-
 				lineFrs.setAD_Org_ID(fromLine.getAD_OrgDoc_ID());
 				lineFrs.setAccount_ID(combi.getAccount_ID());
 				lineFrs.setC_BPartner_ID(line.getC_BPartner_ID());

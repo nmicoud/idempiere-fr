@@ -79,6 +79,7 @@
 401200,Fournisseurs de prestations de services,,Liability,,Yes,No,V_LIABILITY_SERVICES_ACCT,40
 403000,Paiements fournisseurs non affectés,,Liability,,Yes,No,B_PAYMENTSELECT_ACCT,40
 408100,Fournisseurs - FNP,,Liability,,Yes,No,NOTINVOICEDRECEIPTS_ACCT,40
+408600,Fournisseur - Charges à payer,,Liability,,No,No,LFR_ODSituationPrepaCAP_Acct,
 409100,Fournisseurs - Avances et acomptes versés sur commandes,,Asset,,Yes,No,V_PREPAYMENT_ACCT,40
 411100,Clients - Ventes de biens ou de prestations de services,,Asset,,Yes,No,C_RECEIVABLE_ACCT,51
 411200,Accounts Receivable Services - Trade,,Asset,,Yes,No,C_RECEIVABLE_SERVICES_ACCT,51
@@ -87,6 +88,7 @@
 419100,Clients - Avances et acomptes re çus sur commandes,,Liability,,Yes,No,C_PREPAYMENT_ACCT,41
 445660,TVA déductible sur autres biens et services,,Asset,,Yes,No,T_CREDIT_ACCT,44
 445710,T.V.A. Collectée,,Liability,,Yes,No,T_DUE_ACCT,44
+445860,TVA / fact non parvenues ,,Liability,,Yes,No,LFR_ODSituationPrepaTCAP_Acct,45
 455100,Groupe Dettes,,Liability,,Yes,No,INTERCOMPANYDUETO_ACCT,45
 455200,Groupe Créances,,Asset,,Yes,No,INTERCOMPANYDUEFROM_ACCT,45
 470000,Account_Acct,,Expense,,Yes,No,DEFAULT_ACCT,47
@@ -95,6 +97,7 @@
 471003,Landed Cost Clearing,,Expense,,Yes,No,P_LANDEDCOSTCLEARING_ACCT,47
 476200,Augmentation des dettes,,Revenue,,Yes,No,UNREALIZEDGAIN_ACCT,47
 477200,Diminution des dettes,,Expense,,Yes,No,UNREALIZEDLOSS_ACCT,47
+486000,Charges constatées d'avance,,Liability,,Yes,No,LFR_ODSituationPrepaCCA_Acct,48
 511200,Règlements en attente,,Asset,,Yes,No,B_INTRANSIT_ACCT,51
 512000,Banques,,Asset,,Yes,No,B_ASSET_ACCT,51
 531100,Caisse en monnaie nationale,,Asset,,Yes,No,CB_ASSET_ACCT,53

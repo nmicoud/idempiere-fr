@@ -39,6 +39,9 @@ public class SystemIDs_LFR {
 	// Colonnes
 	public static final String C_ACCTSCHEMA_GL_LFR_RAN_BENEFACCT = "LFR_RanBenef_Acct";
 	public static final String C_ACCTSCHEMA_GL_LFR_RAN_PERTEACCT = "LFR_RanPerte_Acct";
+	public static final String C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CCAACCT = "LFR_ODSituationPrepaCCA_Acct";
+	public static final String C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CAPACCT = "LFR_ODSituationPrepaCAP_Acct";
+	public static final String C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_TCAPACCT = "LFR_ODSituationPrepaTCAP_Acct";
 	public static final String C_INVOICELINE_LFR_IMPUTATIONDATEDEB = "LFR_ImputationDateDeb";
 	public static final String C_INVOICELINE_LFR_IMPUTATIONDATEFIN = "LFR_ImputationDateFin";
 }
