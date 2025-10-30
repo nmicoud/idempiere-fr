@@ -94,11 +94,11 @@ public class MLFRODSituationPrepaLine extends X_LFR_ODSituationPrepaLine {
 	}	//	afterDelete	
 
 	private void setHeader() {
-		DB.executeUpdateEx("UPDATE LFR_ODSituationPrepa sp "
-				+ "SET sp.TotalAmt = (SELECT COALESCE(SUM(AmtAcct), 0) "
-				+ "FROM LFR_ODSituationPrepaLine spl "
-				+ "WHERE sp.LFR_ODSituationPrepa_ID = LFR_ODSituationPrepa_ID AND IsActive='Y') "
-				+ "WHERE sp.LFR_ODSituationPrepa_ID = ?", new Object[] {getLFR_ODSituationPrepa_ID()}, get_TrxName());
+		DB.executeUpdateEx("UPDATE LFR_ODSituationPrepa sp"
+				+ " SET TotalAmt = (SELECT COALESCE(SUM(AmtAcct), 0)"
+				+ " FROM LFR_ODSituationPrepaLine spl"
+				+ " WHERE sp.LFR_ODSituationPrepa_ID = LFR_ODSituationPrepa_ID AND IsActive='Y')"
+				+ " WHERE sp.LFR_ODSituationPrepa_ID = ?", new Object[] {getLFR_ODSituationPrepa_ID()}, get_TrxName());
 	}	//	setHeader
 
 	public void setTaxAmtForCAP(MInvoice i) {

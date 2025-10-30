@@ -37,7 +37,7 @@ import fr.idempiere.model.MLFRODSituationPrepa;
  *  @author Nicolas Micoud - TGI
  */
 
-public class LFR_ODSituationPrepasyncLines extends LfrProcess {
+public class LFR_ODSituationPrepaSyncLines extends LfrProcess {
 
 	private boolean	p_DeleteOld = true;
 
@@ -60,7 +60,7 @@ public class LFR_ODSituationPrepasyncLines extends LfrProcess {
 		MLFRODSituationPrepa sp = new MLFRODSituationPrepa (getCtx(), getRecord_ID(), get_TrxName());
 
 		if (p_DeleteOld)
-			DB.executeUpdateEx("DELETE FROM LFR_ODSituationPrepaLine WHERE LFR_ODSituationPrepa_ID = " + getRecord_ID(), get_TrxName()); // TODO passer par une variable
+			DB.executeUpdateEx("DELETE FROM LFR_ODSituationPrepaLine WHERE LFR_ODSituationPrepa_ID = ?", new Object[] {getRecord_ID()}, get_TrxName());
 
 		return sp.syncLines(false);
 	}

@@ -281,8 +281,8 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 		ResultSet rs = null;
 		try {
 			pstmt = DB.prepareStatement ("SELECT * FROM LFR_ODSituationPrepaLine WHERE LFR_ODSituationPrepa_ID = ?", get_TrxName());
-			rs = pstmt.executeQuery ();
 			pstmt.setInt(1, getLFR_ODSituationPrepa_ID());
+			rs = pstmt.executeQuery ();
 			while (rs.next ()) {
 				MLFRODSituationPrepaLine spl = new MLFRODSituationPrepaLine (getCtx(), rs, get_TrxName());
 				MInvoiceLine il = new MInvoiceLine(getCtx(), spl.getC_InvoiceLine_ID(), get_TrxName());
@@ -314,8 +314,7 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 			DB.close(rs, pstmt);
 		}
 
-		return returnEmptyStringIfNoError ? "" : // TODO faire un seul message et l'appeler avec les arguments
-			Msg.translate(getCtx(), "XXA_InvoiceLinesSearchOK") + " : " + nbPrepaLines + " " + Msg.translate(getCtx(), "XXA_TransferedLines") + " / " + countdiff + " " + Msg.translate(getCtx(), "XXA_DifferentLines");
+		return returnEmptyStringIfNoError ? "" : Msg.getMsg(getCtx(), "LFR_ODSituationPrepaSyncLinesOK", new Object[] {nbPrepaLines, countdiff});
 	}
 	
 	private int insertLines(String type) {
@@ -324,45 +323,38 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 		int count = 0;
 
 		//	Sélection des lignes de factures avec dates imputation qui encadrent la date de la situation, quelque soit la date de la facture
-		String sql = "SELECT i.C_Invoice_ID, il.C_InvoiceLine_ID, dt.DocBaseType, fa.Fact_Acct_ID, ev.Value AS AccountValue, bp.Name AS BPartnerName" // 1, 2, 3
-				+ " FROM C_Invoice i, C_InvoiceLine il, C_DocType dt, Fact_Acct fa, C_ElementValue ev, C_BPartner bp"
-				+ " WHERE i.C_Invoice_ID = il.C_Invoice_ID"
-				+ " AND i.C_DocType_ID = dt.C_DocType_ID"
-				+ " AND i.IsSOTrx='N'"
-				+ " AND i.DocStatus IN ('CO', 'CL')"
-				+ " AND i.AD_Client_ID = " + getAD_Client_ID()
-				+ " AND fa.C_AcctSchema_ID = " + getC_AcctSchema_ID()
-				+ " AND fa.AD_Table_ID = " + MInvoice.Table_ID
-				+ " AND fa.Record_ID = i.C_Invoice_ID AND fa.Line_ID = il.C_InvoiceLine_ID"
-				+ " AND fa.Account_ID = ev.C_ElementValue_ID"
-				+ " AND fa.C_BPartner_ID = bp.C_BPartner_ID"
+		StringBuilder sql = new StringBuilder("SELECT i.C_Invoice_ID, il.C_InvoiceLine_ID, dt.DocBaseType, fa.Fact_Acct_ID, ev.Value AS AccountValue, bp.Name AS BPartnerName")
+				.append(" FROM C_Invoice i, C_InvoiceLine il, C_DocType dt, Fact_Acct fa, C_ElementValue ev, C_BPartner bp")
+				.append(" WHERE i.C_Invoice_ID = il.C_Invoice_ID")
+				.append(" AND i.C_DocType_ID = dt.C_DocType_ID")
+				.append(" AND i.IsSOTrx='N'")
+				.append(" AND i.DocStatus IN ('CO', 'CL')")
+				.append(" AND i.AD_Client_ID = ").append(getAD_Client_ID())
+				.append(" AND fa.C_AcctSchema_ID = ").append(getC_AcctSchema_ID())
+				.append(" AND fa.AD_Table_ID = ").append(MInvoice.Table_ID)
+				.append(" AND fa.Record_ID = i.C_Invoice_ID AND fa.Line_ID = il.C_InvoiceLine_ID")
+				.append(" AND fa.Account_ID = ev.C_ElementValue_ID")
+				.append(" AND fa.C_BPartner_ID = bp.C_BPartner_ID")
 				;
 
 		if (!isLFR_IsAllOrgs() && getAD_Org_ID() > 0)
-			sql += " AND fa.AD_Org_ID = " + getAD_Org_ID();
+			sql.append(" AND fa.AD_Org_ID = ").append(getAD_Org_ID());
 
-		if (type.equals(MLFRODSituationPrepa.LFR_ODSITUATIONTYPE_CCA)) { // factures achat avec date facture <= date situation et date fin imputation > date situation 
-			sql += " AND TRUNC(i.DateAcct, 'DD') <= " + DB.TO_DATE(dateSituation)
-			+ " AND TRUNC(il." + C_INVOICELINE_LFR_IMPUTATIONDATEFIN + ", 'DD') > " + DB.TO_DATE(dateSituation);// FIXME nom colonne sur InvoiceLine -> utiliser des constantes
-		}
-		else if (type.equals(MLFRODSituationPrepa.LFR_ODSITUATIONTYPE_CAP)) { // factures achat avec date facture > date situation et date début imputation < date situation
-			sql += " AND TRUNC(i.DateAcct, 'DD') > " + DB.TO_DATE(dateSituation)
-			+ " AND TRUNC(il." + C_INVOICELINE_LFR_IMPUTATIONDATEDEB + ", 'DD') < " + DB.TO_DATE(dateSituation);// FIXME nom colonne sur InvoiceLine -> utiliser des constantes
-		}
+		if (type.equals(MLFRODSituationPrepa.LFR_ODSITUATIONTYPE_CCA)) // factures achat avec date facture <= date situation et date fin imputation > date situation 
+			sql.append(" AND TRUNC(i.DateAcct, 'DD') <= ").append(DB.TO_DATE(dateSituation)).append(" AND TRUNC(il." + C_INVOICELINE_LFR_IMPUTATIONDATEFIN + ", 'DD') > ").append(DB.TO_DATE(dateSituation));
+		else if (type.equals(MLFRODSituationPrepa.LFR_ODSITUATIONTYPE_CAP)) // factures achat avec date facture > date situation et date début imputation < date situation
+			sql.append(" AND TRUNC(i.DateAcct, 'DD') > ").append(DB.TO_DATE(dateSituation)).append(" AND TRUNC(il." + C_INVOICELINE_LFR_IMPUTATIONDATEDEB + ", 'DD') < ").append(DB.TO_DATE(dateSituation));
 
-		sql += "AND NOT EXISTS (SELECT * FROM LFR_ODSituationPrepaLine spl"
-				+ " WHERE fa.Fact_Acct_ID = spl.Fact_Acct_ID"
-				+ " AND spl.LFR_ODSituationPrepa_ID = " + getLFR_ODSituationPrepa_ID() + ")"
-				;
-
-		sql += " ORDER BY i.DateAcct, il.Line";
+		sql.append("AND NOT EXISTS (SELECT * FROM LFR_ODSituationPrepaLine spl")
+		.append(" WHERE fa.Fact_Acct_ID = spl.Fact_Acct_ID")
+		.append(" AND spl.LFR_ODSituationPrepa_ID = ").append(getLFR_ODSituationPrepa_ID()).append(")")
+		.append(" ORDER BY i.DateAcct, il.Line");
 
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
 			pstmt = DB.prepareStatement(sql.toString(), get_TrxName());
 			rs = pstmt.executeQuery ();
-			// TODO gérer les paramètres ici avec une variable idx / tenir compte du typa CCA et/ou CAP 
 
 			while (rs.next()) {
 				MInvoice i = new MInvoice(getCtx(), rs.getInt("C_Invoice_ID"), get_TrxName());
