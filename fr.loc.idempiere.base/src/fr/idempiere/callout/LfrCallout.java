@@ -23,65 +23,71 @@
  * - Nicolas Micoud - TGI                                              *
  **********************************************************************/
 
-package fr.idempiere.event;
+package fr.idempiere.callout;
 
 import static fr.idempiere.model.SystemIDs_LFR.C_INVOICELINE_LFR_IMPUTATIONDATEDEB;
 import static fr.idempiere.model.SystemIDs_LFR.C_INVOICELINE_LFR_IMPUTATIONDATEFIN;
-import static fr.idempiere.model.SystemIDs_LFR.LFR_IN_USE;
 
 import java.sql.Timestamp;
+import java.util.Properties;
 
-import org.adempiere.base.event.AbstractEventHandler;
-import org.adempiere.base.event.IEventManager;
-import org.adempiere.base.event.IEventTopics;
-import org.adempiere.base.event.LoginEventData;
-import org.adempiere.exceptions.AdempiereException;
+import org.adempiere.base.IColumnCallout;
+import org.compiere.model.GridField;
+import org.compiere.model.GridTab;
 import org.compiere.model.MInvoiceLine;
-import org.compiere.model.MSysConfig;
-import org.compiere.model.PO;
-import org.compiere.util.Env;
+import org.compiere.util.CLogger;
+import org.compiere.util.TimeUtil;
 import org.compiere.util.Util;
-import org.osgi.service.event.Event;
 
 import fr.idempiere.util.LfrUtil;
 
 
-public class LfrEvents extends AbstractEventHandler {
+public class LfrCallout implements IColumnCallout {
+
+	private static CLogger s_log = CLogger.getCLogger (LfrCallout.class);
 
 	@Override
-	protected void initialize() {
-		registerEvent(IEventTopics.AFTER_LOGIN);
+	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) {
 
-		registerTableEvent(IEventTopics.PO_BEFORE_NEW, MInvoiceLine.Table_Name);
-		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, MInvoiceLine.Table_Name);
-	}
+		String tableName = mTab.getTableName();
+		String columnName = mField.getColumnName();
 
-	@Override
-	protected void doHandleEvent(Event event) {
-
-		String topic = event.getTopic();
-
-		if (topic.equals(IEventTopics.AFTER_LOGIN)) {
-			LoginEventData loginData = (LoginEventData) event.getProperty(IEventManager.EVENT_DATA);
-			boolean useLfr = MSysConfig.getBooleanValue(LFR_IN_USE, false, loginData.getAD_Client_ID());
-			Env.setContext(Env.getCtx(), "#LFR", useLfr);
-			return;
+		if (tableName.equals(MInvoiceLine.Table_Name)) {
+			if (columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEDEB))
+				onInvoiceLineImputationDateDeb(ctx, mTab, value);
+			else if (columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEFIN))
+				onInvoiceLineImputationDateFin(ctx, mTab, value);
 		}
 
-		PO po = getPO(event);
-
-		if (po.get_TableName().equals(MInvoiceLine.Table_Name)) {
-
-			MInvoiceLine il = (MInvoiceLine) po;
-
-			if (il.get_Value(C_INVOICELINE_LFR_IMPUTATIONDATEDEB) != null && il.get_Value(C_INVOICELINE_LFR_IMPUTATIONDATEFIN) != null) {
-				Timestamp deb = (Timestamp) il.get_Value(C_INVOICELINE_LFR_IMPUTATIONDATEDEB);
-				Timestamp fin = (Timestamp) il.get_Value(C_INVOICELINE_LFR_IMPUTATIONDATEFIN);
-
-				String err = LfrUtil.checkInvoiceLineImputation(il.getCtx(), deb, fin);
-				if (!Util.isEmpty(err))
-					throw new AdempiereException(err);
-			}
-		}
+		return "";
 	}
+
+	private void onInvoiceLineImputationDateDeb(Properties ctx, GridTab mTab, Object value) {
+
+		if (value != null && mTab.getValue(C_INVOICELINE_LFR_IMPUTATIONDATEFIN) != null)
+			checkInvoiceLineImputationDates(ctx, mTab);
+	}
+
+	private void onInvoiceLineImputationDateFin(Properties ctx, GridTab mTab, Object value) {
+
+		if (value != null && mTab.getValue(C_INVOICELINE_LFR_IMPUTATIONDATEDEB) != null)
+			checkInvoiceLineImputationDates(ctx, mTab);
+	}
+
+	private void checkInvoiceLineImputationDates(Properties ctx, GridTab mTab) {
+
+		Timestamp deb = (Timestamp) mTab.getValue(C_INVOICELINE_LFR_IMPUTATIONDATEDEB);
+		Timestamp fin = (Timestamp) mTab.getValue(C_INVOICELINE_LFR_IMPUTATIONDATEFIN);
+
+		String err = LfrUtil.checkInvoiceLineImputation(ctx, deb, fin);
+
+		if (Util.isEmpty(err)) { // on s'assure qu'il n'y a pas trop d'écart entre les dates saisies
+			int nbDays = TimeUtil.getDaysBetween(deb, fin);
+			if (nbDays > 3650)
+				mTab.fireDataStatusEEvent("Warning", "Plus de 10 ans entre les dates d'imputation", false);
+		}
+		else
+			mTab.fireDataStatusEEvent("Warning", err, false);
+	}
+
 }

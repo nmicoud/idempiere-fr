@@ -89,7 +89,7 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 		if (newRecord) {
 			String err = syncLines(true);
 			if (!Util.isEmpty(err)) {
-				log.saveError("Error", err);
+				log.saveError("SaveError", Msg.parseTranslation(getCtx(), err));
 				return false;
 			}
 		}
@@ -273,15 +273,15 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 		}
 
 		// Contrôle différences entre lignes de factures et lignes de préparation d'OD
-		String sql2 = "SELECT * FROM LFR_ODSituationPrepaLine WHERE LFR_ODSituationPrepa_ID = "+ getLFR_ODSituationPrepa_ID();
 		int countdiff = 0;
-		PreparedStatement pstmt2 = null;
-		ResultSet rs2 = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
 		try {
-			pstmt2 = DB.prepareStatement (sql2, get_TrxName());
-			rs2 = pstmt2.executeQuery ();
-			while (rs2.next ()) {
-				MLFRODSituationPrepaLine spl = new MLFRODSituationPrepaLine (getCtx(), rs2, get_TrxName());
+			pstmt = DB.prepareStatement ("SELECT * FROM LFR_ODSituationPrepaLine WHERE LFR_ODSituationPrepa_ID = ?", get_TrxName());
+			rs = pstmt.executeQuery ();
+			pstmt.setInt(1, getLFR_ODSituationPrepa_ID());
+			while (rs.next ()) {
+				MLFRODSituationPrepaLine spl = new MLFRODSituationPrepaLine (getCtx(), rs, get_TrxName());
 				MInvoiceLine il = new MInvoiceLine(getCtx(), spl.getC_InvoiceLine_ID(), get_TrxName());
 				MFactAcct fa = new MFactAcct(getCtx(), spl.getFact_Acct_ID(), get_TrxName());
 
@@ -302,19 +302,16 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 
 				spl.saveEx();
 			}
-			rs2.close ();
-			pstmt2.close ();
-			pstmt2 = null;
 		}
 		catch (Exception e) {
 			log.severe("Error while inserting lines " + type + " : " + e);
 			return "@Error@ while inserting lines " + type + " : " + e;
 		}
 		finally {
-			DB.close(rs2, pstmt2);
+			DB.close(rs, pstmt);
 		}
 
-		return returnEmptyStringIfNoError ? "" : 
+		return returnEmptyStringIfNoError ? "" : // TODO faire un seul message et l'appeler avec les arguments
 			Msg.translate(getCtx(), "XXA_InvoiceLinesSearchOK") + " : " + nbPrepaLines + " " + Msg.translate(getCtx(), "XXA_TransferedLines") + " / " + countdiff + " " + Msg.translate(getCtx(), "XXA_DifferentLines");
 	}
 	
@@ -343,11 +340,11 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 
 		if (type.equals(MLFRODSituationPrepa.LFR_ODSITUATIONTYPE_CCA)) { // factures achat avec date facture <= date situation et date fin imputation > date situation 
 			sql += " AND TRUNC(i.DateAcct, 'DD') <= " + DB.TO_DATE(dateSituation)
-			+ " AND TRUNC(il.XXA_ImputDateFin, 'DD') > " + DB.TO_DATE(dateSituation);// FIXME nom colonne sur InvoiceLine -> utiliser des constantes
+			+ " AND TRUNC(il." + C_INVOICELINE_LFR_IMPUTATIONDATEFIN + ", 'DD') > " + DB.TO_DATE(dateSituation);// FIXME nom colonne sur InvoiceLine -> utiliser des constantes
 		}
 		else if (type.equals(MLFRODSituationPrepa.LFR_ODSITUATIONTYPE_CAP)) { // factures achat avec date facture > date situation et date début imputation < date situation
 			sql += " AND TRUNC(i.DateAcct, 'DD') > " + DB.TO_DATE(dateSituation)
-			+ " AND TRUNC(il.XXA_ImputDateDeb, 'DD') < " + DB.TO_DATE(dateSituation);// FIXME nom colonne sur InvoiceLine -> utiliser des constantes
+			+ " AND TRUNC(il." + C_INVOICELINE_LFR_IMPUTATIONDATEDEB + ", 'DD') < " + DB.TO_DATE(dateSituation);// FIXME nom colonne sur InvoiceLine -> utiliser des constantes
 		}
 
 		sql += "AND NOT EXISTS (SELECT * FROM LFR_ODSituationPrepaLine spl"
@@ -362,10 +359,13 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 		try {
 			pstmt = DB.prepareStatement(sql.toString(), get_TrxName());
 			rs = pstmt.executeQuery ();
+			// TODO gérer les paramètres ici avec une variable idx / tenir compte du typa CCA et/ou CAP 
 
 			while (rs.next()) {
 				MInvoice i = new MInvoice(getCtx(), rs.getInt("C_Invoice_ID"), get_TrxName());
 				MInvoiceLine il = new MInvoiceLine(getCtx(), rs.getInt("C_InvoiceLine_ID"), get_TrxName());
+				Timestamp ilImputDateDeb = (Timestamp) il.get_Value(C_INVOICELINE_LFR_IMPUTATIONDATEDEB);
+				Timestamp ilImputDateFin = (Timestamp) il.get_Value(C_INVOICELINE_LFR_IMPUTATIONDATEFIN);
 				String dbt = rs.getString("DocBaseType");
 
 				MFactAcct fa = new MFactAcct(getCtx(), rs.getInt("Fact_Acct_ID"), get_TrxName());
@@ -385,8 +385,8 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 				spl.setC_InvoiceLine_ID(il.getC_InvoiceLine_ID());
 				spl.setLFR_FactAcct_AmtAcct(fa.getAmtAcctDr().subtract(fa.getAmtAcctCr()));
 				spl.setDescription(il.getDescription());
-				spl.setLFR_ImputationDateDeb((Timestamp) il.get_Value("XXA_ImputDateDeb")); // FIXME nom colonne -> utiliser des constantes
-				spl.setLFR_ImputationDateFin((Timestamp) il.get_Value("XXA_ImputDateFin")); // FIXME nom colonne -> utiliser des constantes
+				spl.setLFR_ImputationDateDeb(ilImputDateDeb);
+				spl.setLFR_ImputationDateFin(ilImputDateFin);
 
 				// Données de la ligne d'écriture (lecture seule)
 				spl.setFact_Acct_ID(fa.getFact_Acct_ID());
@@ -413,8 +413,7 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 				BigDecimal montant = new BigDecimal(0);
 				Boolean inverseMtts = false;	// inversion des mtts dans le cas d'un avoir
 
-				Timestamp ilImputDateDeb = (Timestamp) il.get_Value("XXA_ImputDateDeb"); // FIXME nom colonne
-				Timestamp ilImputDateFin = (Timestamp) il.get_Value("XXA_ImputDateFin"); // FIXME nom colonne
+
 
 				//	CCA ; date antérieure à la situation
 				if (i.getDateAcct().getTime() <= dateSituation.getTime()) {

@@ -23,47 +23,30 @@
  * - Nicolas Micoud - TGI                                              *
  **********************************************************************/
 
-package fr.idempiere.util;
+package fr.idempiere.callout;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.Properties;
+import static fr.idempiere.model.SystemIDs_LFR.C_INVOICELINE_LFR_IMPUTATIONDATEDEB;
+import static fr.idempiere.model.SystemIDs_LFR.C_INVOICELINE_LFR_IMPUTATIONDATEFIN;
 
-import org.compiere.model.MClient;
-import org.compiere.util.Msg;
-import org.compiere.util.TimeUtil;
-import org.compiere.util.Util;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.adempiere.base.IColumnCallout;
+import org.adempiere.base.IColumnCalloutFactory;
+import org.compiere.model.MInvoiceLine;
 
-/**
- * Util class for LFR
- * @author Nicolas Micoud - TGI
- */
+public class LfrCalloutFactory implements IColumnCalloutFactory{
 
-public class LfrUtil extends Util {
+	public IColumnCallout[] getColumnCallouts(String tableName, String columnName) {
 
-	/** Formatte la date passée en paramètre selon le format défini */
-	public static String formatDate (Properties ctx, int clientID, Object value) {
-		return formatDate(ctx, clientID, value, "");
-	}
+		List<IColumnCallout> list = new ArrayList<IColumnCallout>();
 
-	/** Formatte la date passée en paramètre selon le format défini */
-	public static String formatDate (Properties ctx, int clientID, Object value, String format) {
-		if (Util.isEmpty(format))
-			format = "dd/MM/yyyy";
-
-		Locale locale = MClient.get(ctx, clientID).getLanguage().getLocale();
-		return new SimpleDateFormat(format, locale).format(value);
-	}
-
-	public static String checkInvoiceLineImputation(Properties ctx, Timestamp deb, Timestamp fin) {
-		if (deb != null && fin != null) {
-
-			if (TimeUtil.max(deb, fin) == deb)
-				return Msg.getMsg(ctx, "LFR_InvoiceLineImputationDateFinAvantDateDeb");
+		if (tableName.equals(MInvoiceLine.Table_Name))
+		{
+			if (columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEDEB) || columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEFIN))
+				list.add(new LfrCallout());
 		}
 
-		return "";
+		return list != null ? list.toArray(new IColumnCallout[0]) : new IColumnCallout[0];
 	}
 }
