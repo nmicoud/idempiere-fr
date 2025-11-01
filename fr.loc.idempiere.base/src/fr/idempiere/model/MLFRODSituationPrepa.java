@@ -170,6 +170,21 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 				return status;
 		}
 
+		MAcctSchemaGL asGL = MAcctSchema.get(getCtx(), getC_AcctSchema_ID()).getAcctSchemaGL();
+
+		if (getLFR_ODSituationType().contains(LFR_ODSITUATIONTYPE_CCA)) {
+			if (asGL.get_ValueAsInt(C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CCAACCT) <=0) {
+				m_processMsg = "@FillMandatory@ @C_AcctSchema_ID@ > @LFR_ODSituationPrepaCCA_Acct@";
+				return DocAction.STATUS_Invalid;
+			}
+		}
+		if (getLFR_ODSituationType().contains(LFR_ODSITUATIONTYPE_CAP)) {
+			if (asGL.get_ValueAsInt(C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CAPACCT) <=0 || asGL.get_ValueAsInt(C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_TCAPACCT) <=0) {
+				m_processMsg = "@FillMandatory@ @C_AcctSchema_ID@ > @LFR_ODSituationPrepaCAP_Acct@ / @LFR_ODSituationPrepaTCAP_Acct@";
+				return DocAction.STATUS_Invalid;
+			}
+		}
+
 		String err = generate();
 		if (!Util.isEmpty(err)) {
 			m_processMsg = err;
