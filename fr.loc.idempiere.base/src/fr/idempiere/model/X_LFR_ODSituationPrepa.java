@@ -34,7 +34,7 @@ public class X_LFR_ODSituationPrepa extends PO implements I_LFR_ODSituationPrepa
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20251029L;
+	private static final long serialVersionUID = 20251103L;
 
     /** Standard Constructor */
     public X_LFR_ODSituationPrepa (Properties ctx, int LFR_ODSituationPrepa_ID, String trxName)
@@ -44,6 +44,7 @@ public class X_LFR_ODSituationPrepa extends PO implements I_LFR_ODSituationPrepa
         {
 			setAD_OrgDoc_ID (0);
 			setC_AcctSchema_ID (0);
+			setC_DocType_ID (0);
 			setDateAcct (new Timestamp( System.currentTimeMillis() ));
 			setDocAction (null);
 // CO
@@ -71,6 +72,7 @@ public class X_LFR_ODSituationPrepa extends PO implements I_LFR_ODSituationPrepa
         {
 			setAD_OrgDoc_ID (0);
 			setC_AcctSchema_ID (0);
+			setC_DocType_ID (0);
 			setDateAcct (new Timestamp( System.currentTimeMillis() ));
 			setDocAction (null);
 // CO
@@ -98,6 +100,7 @@ public class X_LFR_ODSituationPrepa extends PO implements I_LFR_ODSituationPrepa
         {
 			setAD_OrgDoc_ID (0);
 			setC_AcctSchema_ID (0);
+			setC_DocType_ID (0);
 			setDateAcct (new Timestamp( System.currentTimeMillis() ));
 			setDocAction (null);
 // CO
@@ -125,6 +128,7 @@ public class X_LFR_ODSituationPrepa extends PO implements I_LFR_ODSituationPrepa
         {
 			setAD_OrgDoc_ID (0);
 			setC_AcctSchema_ID (0);
+			setC_DocType_ID (0);
 			setDateAcct (new Timestamp( System.currentTimeMillis() ));
 			setDocAction (null);
 // CO
