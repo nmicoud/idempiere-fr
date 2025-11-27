@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Zk
+Bundle-SymbolicName: fr.loc.idempiere.zk;singleton:=true
+Bundle-Version: 12.0.0.qualifier
+Fragment-Host: org.adempiere.ui.zk;bundle-version="12.0.0"
+Require-Bundle: fr.loc.idempiere.base
+Automatic-Module-Name: fr.loc.idempiere.zk.singleton.true
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Jetty-WarFragmentFolderPath: /
+Bundle-ActivationPolicy: lazy
+Service-Component: OSGI-INF/*.xml

@@ -36,13 +36,18 @@ import org.adempiere.base.event.IEventManager;
 import org.adempiere.base.event.IEventTopics;
 import org.adempiere.base.event.LoginEventData;
 import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.MAcctSchema;
+import org.compiere.model.MAllocationHdr;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
+import org.compiere.model.MPayment;
 import org.compiere.model.MSysConfig;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 import org.compiere.util.Util;
 import org.osgi.service.event.Event;
 
+import fr.idempiere.util.LfrFactReconciliationUtil;
 import fr.idempiere.util.LfrUtil;
 
 
@@ -54,6 +59,10 @@ public class LfrEvents extends AbstractEventHandler {
 
 		registerTableEvent(IEventTopics.PO_BEFORE_NEW, MInvoiceLine.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, MInvoiceLine.Table_Name);
+
+		registerTableEvent(IEventTopics.DOC_AFTER_POST, MInvoice.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_POST, MPayment.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_POST, MAllocationHdr.Table_Name);
 	}
 
 	@Override
@@ -70,7 +79,23 @@ public class LfrEvents extends AbstractEventHandler {
 
 		PO po = getPO(event);
 
-		if (po.get_TableName().equals(MInvoiceLine.Table_Name)) {
+		if (topic.equals(IEventTopics.DOC_AFTER_POST)) {
+			if (po.get_TableName().equals(MInvoice.Table_Name)) {
+				LfrFactReconciliationUtil.factReconcile(po);
+			}
+			else if (po.get_TableName().equals(MPayment.Table_Name)) {
+				LfrFactReconciliationUtil.factReconcile(po);
+			}
+			else if (po.get_TableName().equals(MAllocationHdr.Table_Name)) {
+
+				MAllocationHdr alloc = (MAllocationHdr) po;
+				MAcctSchema[] ass = MAcctSchema.getClientAcctSchema(po.getCtx(), po.getAD_Client_ID());
+				for (MAcctSchema as : ass) {
+					LfrFactReconciliationUtil.LettrageAlloc(po.getCtx(), alloc, alloc.getAD_Client_ID(), as.getC_AcctSchema_ID(), -1, po.get_TrxName());
+				}
+			}
+		}
+		else if (po.get_TableName().equals(MInvoiceLine.Table_Name)) {
 
 			MInvoiceLine il = (MInvoiceLine) po;
 
