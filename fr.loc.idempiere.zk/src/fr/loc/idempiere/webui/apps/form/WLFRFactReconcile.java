@@ -16,11 +16,13 @@ import org.adempiere.webui.component.Button;
 import org.adempiere.webui.component.Label;
 import org.adempiere.webui.component.ListboxFactory;
 import org.adempiere.webui.component.Panel;
-import org.adempiere.webui.component.Textbox;
 import org.adempiere.webui.component.WListbox;
 import org.adempiere.webui.editor.WDateEditor;
 import org.adempiere.webui.editor.WSearchEditor;
+import org.adempiere.webui.editor.WStringEditor;
 import org.adempiere.webui.editor.WTableDirEditor;
+import org.adempiere.webui.event.ValueChangeEvent;
+import org.adempiere.webui.event.ValueChangeListener;
 import org.adempiere.webui.event.WTableModelEvent;
 import org.adempiere.webui.event.WTableModelListener;
 import org.adempiere.webui.panel.ADForm;
@@ -36,6 +38,7 @@ import org.compiere.minigrid.ColumnInfo;
 import org.compiere.minigrid.IDColumn;
 import org.compiere.minigrid.IMiniTable;
 import org.compiere.model.MAllocationHdr;
+import org.compiere.model.MBPartner;
 import org.compiere.model.MColumn;
 import org.compiere.model.MFactAcct;
 import org.compiere.model.MInvoice;
@@ -73,7 +76,7 @@ import fr.idempiere.util.LfrFactReconciliationUtil;
  *  Formulaire de lettrage manuel
  *  @author Nico
  */
-public class WLFRFactReconcile implements IFormController, EventListener<Event>, WTableModelListener
+public class WLFRFactReconcile implements IFormController, EventListener<Event>, ValueChangeListener, WTableModelListener
 {
 	private CustomForm form = new CustomForm();
 	public static CLogger s_log = CLogger.getCLogger(WLFRFactReconcile.class);
@@ -83,15 +86,12 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 	private Button bGenerate, bRefresh, bZoomToFact, bZoomToDoc, bReset;
 	private Panel southPanel;
 	private WTableDirEditor fAcctSchema, fAccount, fOrg, fType, fReconciled;
-	private WSearchEditor fBPartner = null;
+	private WSearchEditor fBPartner;
 	private Label labelDateAcctFrom = new Label();
 	private WDateEditor fieldDateAcctFrom = new WDateEditor();
 	private Label labelDateAcctTo = new Label();
 	private WDateEditor fieldDateAcctTo = new WDateEditor();
-	private Label labelSearchDescription = new Label(Msg.translate(Env.getCtx(), "Description"));
-	private Textbox fieldSearchDescription = new Textbox();
-	private Label labelSearchMatchCode = new Label("Code");
-	private Textbox fieldSearchMatchCode = new Textbox();
+	private WStringEditor fDescription, fMatchCode;
 	private StatusBarPanel statusBar = new StatusBarPanel();
 	private Label dataStatus = new Label();
 
@@ -167,10 +167,10 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 		hl.appendChild(fAccount.getComponent());
 		ZKUpdateUtil.setHflex(fAccount.getComponent(), "1");
 
-		hl.appendChild(labelSearchDescription.rightAlign());
-		labelSearchDescription.setHflex("1");
-		hl.appendChild(fieldSearchDescription);
-		ZKUpdateUtil.setHflex(fieldSearchDescription, "1");
+		hl.appendChild(fDescription.getLabel().rightAlign());
+		fDescription.getLabel().setHflex("1");
+		hl.appendChild(fDescription.getComponent());
+		ZKUpdateUtil.setHflex(fDescription.getComponent(), "1");
 
 		vl.appendChild(hl);
 		hl = getHlayout();
@@ -196,11 +196,11 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 		ZKUpdateUtil.setHflex(fReconciled.getLabel(), "1");
 		hl.appendChild(fReconciled.getComponent());
 		ZKUpdateUtil.setWidth(fReconciled.getComponent(), "100px");
-		
-		hl.appendChild(labelSearchMatchCode.rightAlign());
-		ZKUpdateUtil.setHflex(labelSearchMatchCode, "1");
-		hl.appendChild(fieldSearchMatchCode);
-		ZKUpdateUtil.setWidth(fieldSearchMatchCode, "100px");
+
+		hl.appendChild(fMatchCode.getLabel().rightAlign());
+		fMatchCode.getLabel().setHflex("1");
+		hl.appendChild(fMatchCode.getComponent());
+		ZKUpdateUtil.setHflex(fMatchCode.getComponent(), "1");
 
 		hl.appendChild(createVerticalSeparator(50));
 		hl.appendChild(bRefresh);
@@ -226,6 +226,15 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 		center.appendChild(miniTable);
 		bGenerate.setEnabled(false);
 		bReset.setEnabled(false);
+
+		fAcctSchema.showMenu();
+		fType.showMenu();
+		fBPartner.showMenu();
+		fAccount.showMenu();
+		fDescription.showMenu();
+		fOrg.showMenu();
+		fMatchCode.showMenu();
+		fReconciled.showMenu();
 	}
 
 	protected void dynInit() throws Exception
@@ -252,26 +261,30 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 		fOrg = new WTableDirEditor("AD_Org_ID", true, false, true, lookup);
 		fOrg.getLabel().setValue(Msg.getElement(Env.getCtx(), "AD_Org_ID"));
 
-		int AD_Column_ID = COLUMN_C_INVOICE_C_BPARTNER_ID;
-		MLookup lookupBP = MLookupFactory.get (Env.getCtx(), form.getWindowNo(), 0, AD_Column_ID, DisplayType.Search);
-		fBPartner = new WSearchEditor ("C_BPartner_ID", false, false, true, lookupBP);
+		lookup = MLookupFactory.get (Env.getCtx(), m_WindowNo, 0, COLUMN_C_INVOICE_C_BPARTNER_ID, DisplayType.Search);
+		fBPartner = new WSearchEditor ("C_BPartner_ID", false, false, true, lookup);
+		fBPartner.addValueChangeListener(this);
 		fBPartner.getLabel().setText(Msg.getElement(Env.getCtx(), "C_BPartner_ID"));
 		prepareTable(miniTable, "");
 
-		refID = SystemIDs.REFERENCE_YESNO;
-		lookup = MLookupFactory.get(Env.getCtx(), 0, 0, DisplayType.List, Env.getLanguage(Env.getCtx()), "Reconciled", refID, false, "");
-		fReconciled = new WTableDirEditor("Reconciled", true, false, true, lookup);
+		lookup = MLookupFactory.get(Env.getCtx(), 0, 0, DisplayType.List, Env.getLanguage(Env.getCtx()), "Reconciled", SystemIDs.REFERENCE_YESNO, false, "");
+		fReconciled = new WTableDirEditor("Reconciled", false, false, true, lookup);
 		fReconciled.getComponent().addEventListener(Events.ON_SELECT, this);
 		fReconciled.getLabel().setValue("Ecritures lettrées");
 		fReconciled.setValue("N");
 
+		fDescription = new WStringEditor();
+		fDescription.getLabel().setValue(Msg.getElement(Env.getCtx(), "Description"));
+		fMatchCode = new WStringEditor();
+		fMatchCode.getLabel().setValue(Msg.getElement(Env.getCtx(), "LFR_MatchCode"));
+		
 		miniTable.getModel().addTableModelListener(this);
 
 		statusBar.setStatusLine("");
 		statusBar.setStatusDB("");
 	}   //  dynInit
 
-	public void LoadTableLines(String lettrageType)
+	public void loadTableLines(String lettrageType)
 	{
 		if (fAcctSchema.isNullOrEmpty())
 			throw new WrongValueException(fAcctSchema.getComponent(), Msg.getMsg(Env.getCtx(), "FillMandatory"));
@@ -285,13 +298,15 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 		int acctSchemaID = (Integer) fAcctSchema.getValue();
 		int orgID = fOrg.isNullOrEmpty() ? -1 : (Integer) fOrg.getValue();
 		int accountID = (Integer) fAccount.getValue();
+		String description = (String) fDescription.getValue();
+		String matchCode = (String) fMatchCode.getValue();
 		String Lettree = fReconciled.isNullOrEmpty() ? "" : (String) fReconciled.getValue();
 
 		int bpartnerID = 0;
 		if (!fBPartner.isNullOrEmpty() && lettrageType.equals(MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_BPartner))
 			bpartnerID = (Integer) fBPartner.getValue();
 
-		loadTableInfo(lettrageType, bpartnerID, dateAcctFrom, dateAcctTo, orgID, acctSchemaID, accountID, Lettree, fieldSearchDescription.getText(), fieldSearchMatchCode.getText(), miniTable);
+		loadTableInfo(lettrageType, bpartnerID, dateAcctFrom, dateAcctTo, orgID, acctSchemaID, accountID, Lettree, description, matchCode, miniTable);
 		calculate();
 	}
 
@@ -304,7 +319,7 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 	{
 		dataStatus.setValue(""); // on vide le champs
 
-		String LettrageType = fType.isNullOrEmpty() ? "" : (String) fType.getValue();
+		String lettrageType = fType.isNullOrEmpty() ? "" : (String) fType.getValue();
 
 		if (e.getTarget() == bZoomToFact)
 			zoomToFact();
@@ -313,22 +328,22 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 		else if (e.getTarget() == bGenerate || e.getTarget() == bReset) {
 
 			if (e.getTarget() == bGenerate)
-				generateLettrage(false, LettrageType);
+				generateLettrage(false, lettrageType);
 			if (e.getTarget() == bReset)
-				resetLettrage(false, LettrageType);
+				resetLettrage(false, lettrageType);
 		}
 		else if (e.getTarget() == bRefresh) {	
 			if ((fAccount.getComponent().getItemCount() != 0)
-					&& (LettrageType.equals(MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_Account)
-							|| ((LettrageType.equals(MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_BPartner) && fBPartner.getValue() != null))))
-				LoadTableLines(LettrageType);
+					&& (lettrageType.equals(MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_Account)
+							|| ((lettrageType.equals(MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_BPartner) && fBPartner.getValue() != null))))
+				loadTableLines(lettrageType);
 			else
 				statusBar.setStatusLine(Msg.getMsg(Env.getCtx(), "XXA_NotEnoughCriteriaForSearching"), true);
 		}
 		else if (e.getTarget() == fType.getComponent())
 		{
 			boolean onlyAux = false;
-			if (LettrageType.equals(MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_BPartner))
+			if (lettrageType.equals(MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_BPartner))
 				onlyAux = true;
 
 			fAccount.getComponent().removeAllItems();
@@ -336,10 +351,11 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 			for (KeyNamePair acct : getAccountData(onlyAux))
 				fAccount.getComponent().appendItem(acct.getName(), acct.getKey());
 
-			bpartnerActivate(LettrageType.equals(MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_BPartner));
-			LoadTableLines(LettrageType);
+			bpartnerActivate(lettrageType.equals(MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_BPartner));
+			loadTableLines(lettrageType);
 		}
-	}   //  actionPerformed
+		
+	}   //  onEvent
 
 	public void calculate()
 	{
@@ -446,7 +462,7 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 			return;
 		}
 
-		LoadTableLines(LettrageType);
+		loadTableLines(LettrageType);
 		dataStatus.setValue(nbLines + " " + (Msg.getMsg(Env.getCtx(), (isTemp ? "XXA_Lettrageecriturespointees" : "XXA_LettrageecrituresLettrees"))));
 	}   //  generateLettrage
 
@@ -473,7 +489,7 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 
 		int nbReset = resetLettrage(miniTable, LettrageType, isTemp, acctSchemaID, Record_ID);
 
-		LoadTableLines(LettrageType);
+		loadTableLines(LettrageType);
 		dataStatus.setValue(nbReset + " " + (Msg.getMsg(Env.getCtx(), "XXA_LettrageEcrituresDeLettrees")));
 	}   //  resetLettrage
 
@@ -875,5 +891,27 @@ public class WLFRFactReconcile implements IFormController, EventListener<Event>,
 		Hlayout layout = new Hlayout();
 		layout.setValign("middle");
 		return layout;
+	}
+
+	@Override
+	public void valueChange(ValueChangeEvent evt) {
+		if (evt.getSource() == fBPartner) {
+
+			fAccount.setValue(null);
+
+			if (evt.getNewValue() != null && !fAcctSchema.isNullOrEmpty()) {
+				MBPartner bp = new MBPartner(Env.getCtx(), (Integer) evt.getNewValue(), null);
+				if (bp.isCustomer() || bp.isVendor() && !(bp.isCustomer() && bp.isVendor())) {
+					int accountID = 0;
+					if (bp.isCustomer())
+						accountID = DB.getSQLValueEx(null, "SELECT vc.Account_ID FROM C_BP_Customer_Acct bpa, C_ValidCombination vc WHERE bpa.C_Receivable_Acct = vc.C_ValidCombination_ID AND bpa.C_BPartner_ID = ? AND bpa.C_AcctSchema_ID = ?", evt.getNewValue(), fAcctSchema.getValue());
+					else if (bp.isVendor())
+						accountID = DB.getSQLValueEx(null, "SELECT vc.Account_ID FROM C_BP_Vendor_Acct bpa, C_ValidCombination vc WHERE bpa.V_Liability_Acct = vc.C_ValidCombination_ID AND bpa.C_BPartner_ID = ? AND bpa.C_AcctSchema_ID = ?", evt.getNewValue(), fAcctSchema.getValue());
+					if (accountID > 0)
+						fAccount.setValue(accountID);
+				}
+			}
+
+		}
 	}
 }   //  WLFRFactReconcile
