@@ -33,7 +33,6 @@ import java.util.List;
 import org.compiere.model.MClient;
 import org.compiere.model.MPeriod;
 import org.compiere.model.MPeriodControl;
-import org.compiere.model.MTable;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.util.CacheMgt;
 import org.compiere.util.DB;
@@ -75,10 +74,10 @@ public class LFR_PeriodAutoClose extends LfrProcess {
 		else {
 
 			StringBuilder retValue = new StringBuilder();
-			for (MClient client : MClient.getAll(getCtx(), "AD_Client_ID")) {
-				if (client.getAD_Client_ID() > MTable.MAX_OFFICIAL_ID)
-					retValue.append(" ").append(client.getName()).append(": ").append(process(client.getAD_Client_ID()));
-			}
+			String sql = "SELECT DISTINCT c.AD_Client_ID FROM AD_Client c, LFR_PeriodAutoCloseDBT pac WHERE c.AD_Client_ID = pac.AD_Client_ID AND c.IsActive = 'Y' AND pac.IsActive = 'Y'";
+
+			for (int clientID : DB.getIDsEx(get_TrxName(), sql))
+				retValue.append(" ").append(MClient.get(getCtx(), clientID).getName()).append(" : ").append(process(clientID));
 
 			return "@ProcessOK@ " + retValue;
 		}
