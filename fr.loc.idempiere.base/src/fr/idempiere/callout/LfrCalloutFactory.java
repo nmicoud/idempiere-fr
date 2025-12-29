@@ -33,7 +33,10 @@ import java.util.List;
 
 import org.adempiere.base.IColumnCallout;
 import org.adempiere.base.IColumnCalloutFactory;
+import org.compiere.model.MBPBankAccount;
 import org.compiere.model.MInvoiceLine;
+
+import fr.idempiere.model.MLFRPaySelectionPrepayment;
 
 public class LfrCalloutFactory implements IColumnCalloutFactory{
 
@@ -41,9 +44,18 @@ public class LfrCalloutFactory implements IColumnCalloutFactory{
 
 		List<IColumnCallout> list = new ArrayList<IColumnCallout>();
 
-		if (tableName.equals(MInvoiceLine.Table_Name))
+		if (tableName.equals(MBPBankAccount.Table_Name)) {
+			if (columnName.equals(MBPBankAccount.COLUMNNAME_C_BPartner_ID))
+				list.add(new LfrCallout());
+		}
+		else if (tableName.equals(MInvoiceLine.Table_Name))
 		{
 			if (columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEDEB) || columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEFIN))
+				list.add(new LfrCallout());
+		}
+
+		else if (tableName.equals(MLFRPaySelectionPrepayment.Table_Name)) {
+			if (columnName.equals(MLFRPaySelectionPrepayment.COLUMNNAME_C_Payment_ID))
 				list.add(new LfrCallout());
 		}
 

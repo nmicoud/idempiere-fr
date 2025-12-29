@@ -22,29 +22,30 @@
  * Contributors:                                                       *
  * - Nicolas Micoud - TGI                                              *
  **********************************************************************/
-package fr.idempiere.model;
 
+package fr.idempiere.factories;
 
-/**
- *  List all hardcoded ID used in the code
- *  @author Nicolas Micoud - TGI
- */
+import org.adempiere.base.IPaymentExporterFactory;
+import org.compiere.util.CLogger;
+import org.compiere.util.PaymentExport;
+import fr.idempiere.util.SEPAPaymentExport;
 
-public class SystemIDs_LFR {
+public class LfrPaymentExporterFactory implements IPaymentExporterFactory {
 
-	// System Configurator
-	public final static String LFR_IN_USE = "LFR_IN_USE";
-	public final static String LFR_PERIOD_AUTO_CLOSE_DOCBASETYPE_DAYS = "LFR_PERIOD_AUTO_CLOSE_DOCBASETYPE_DAYS";
+	@SuppressWarnings("unused")
+	private final static CLogger s_log = CLogger.getCLogger(LfrPaymentExporterFactory.class);
 
-	// Colonnes
-	public static final String C_ACCTSCHEMA_GL_LFR_RAN_BENEFACCT = "LFR_RanBenef_Acct";
-	public static final String C_ACCTSCHEMA_GL_LFR_RAN_PERTEACCT = "LFR_RanPerte_Acct";
-	public static final String C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CCAACCT = "LFR_ODSituationPrepaCCA_Acct";
-	public static final String C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CAPACCT = "LFR_ODSituationPrepaCAP_Acct";
-	public static final String C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_TCAPACCT = "LFR_ODSituationPrepaTCAP_Acct";
-	public static final String C_BP_BANKACCOUNT_LFR_ISDEFAULT = "IsDefault";
-	public static final String C_INVOICELINE_LFR_IMPUTATIONDATEDEB = "LFR_ImputationDateDeb";
-	public static final String C_INVOICELINE_LFR_IMPUTATIONDATEFIN = "LFR_ImputationDateFin";
-	public static final String C_PAYSELECTION_LFR_PAYSELECTIONCREATEPAYMENT = "LFR_PaySelectionCreatePayment";
-	public static final String C_PAYSELECTION_LFR_PAYSELECTIONEXPORT = "LFR_PaySelectionExport";
+	/**
+	 * default constructor
+	 */
+	public LfrPaymentExporterFactory() {
+	}
+
+	@Override
+	public PaymentExport newPaymentExporterInstance(String className) {
+		if (SEPAPaymentExport.class.getName().equals(className))
+			return new SEPAPaymentExport();
+		return null;
+	}
+
 }

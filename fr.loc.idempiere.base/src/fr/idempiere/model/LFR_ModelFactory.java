@@ -40,6 +40,8 @@ public class LFR_ModelFactory implements IModelFactory {
 			return MLFRODSituationPrepa.class;
 		if (MLFRODSituationPrepaLine.Table_Name.equals(tableName))
 			return MLFRODSituationPrepaLine.class;
+		if (MLFRPaySelectionPrepayment.Table_Name.equals(tableName))
+			return MLFRPaySelectionPrepayment.class;
 		if (MLFRPeriodAutoCloseDBT.Table_Name.equals(tableName))
 			return MLFRPeriodAutoCloseDBT.class;
 		if (MTLFRReport.Table_Name.equals(tableName))
@@ -55,6 +57,8 @@ public class LFR_ModelFactory implements IModelFactory {
 			return new MLFRODSituationPrepa(Env.getCtx(), Record_ID, trxName);
 		if (tableName.equals(MLFRODSituationPrepaLine.Table_Name))
 			return new MLFRODSituationPrepaLine(Env.getCtx(), Record_ID, trxName);
+		if (tableName.equals(MLFRPaySelectionPrepayment.Table_Name))
+			return new MLFRPaySelectionPrepayment(Env.getCtx(), Record_ID, trxName);
 		if (tableName.equals(MLFRPeriodAutoCloseDBT.Table_Name))
 			return new MLFRPeriodAutoCloseDBT(Env.getCtx(), Record_ID, trxName);
 		if (tableName.equals(MTLFRReport.Table_Name))
@@ -70,6 +74,8 @@ public class LFR_ModelFactory implements IModelFactory {
 			return new MLFRODSituationPrepa(Env.getCtx(), rs, trxName);
 		if (MLFRODSituationPrepaLine.Table_Name.equals(tableName))
 			return new MLFRODSituationPrepaLine(Env.getCtx(), rs, trxName);
+		if (MLFRPaySelectionPrepayment.Table_Name.equals(tableName))
+			return new MLFRPaySelectionPrepayment(Env.getCtx(), rs, trxName);
 		if (MLFRPeriodAutoCloseDBT.Table_Name.equals(tableName))
 			return new MLFRPeriodAutoCloseDBT(Env.getCtx(), rs, trxName);
 		if (MTLFRReport.Table_Name.equals(tableName))

@@ -28,17 +28,24 @@ package fr.idempiere.callout;
 import static fr.idempiere.model.SystemIDs_LFR.C_INVOICELINE_LFR_IMPUTATIONDATEDEB;
 import static fr.idempiere.model.SystemIDs_LFR.C_INVOICELINE_LFR_IMPUTATIONDATEFIN;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Properties;
 
 import org.adempiere.base.IColumnCallout;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
+import org.compiere.model.MBPBankAccount;
+import org.compiere.model.MBankAccount;
+import org.compiere.model.MConversionRate;
 import org.compiere.model.MInvoiceLine;
+import org.compiere.model.MPayment;
 import org.compiere.util.CLogger;
+import org.compiere.util.DB;
 import org.compiere.util.TimeUtil;
 import org.compiere.util.Util;
 
+import fr.idempiere.model.MLFRPaySelectionPrepayment;
 import fr.idempiere.util.LfrUtil;
 
 
@@ -52,11 +59,19 @@ public class LfrCallout implements IColumnCallout {
 		String tableName = mTab.getTableName();
 		String columnName = mField.getColumnName();
 
-		if (tableName.equals(MInvoiceLine.Table_Name)) {
+		if (tableName.equals(MBPBankAccount.Table_Name)) {
+			if (columnName.equals(MBPBankAccount.COLUMNNAME_C_BPartner_ID) && mTab.getParentTab() == null)
+				onBPBankAccountBPartnerID(mTab, value);
+		}
+		else if (tableName.equals(MInvoiceLine.Table_Name)) {
 			if (columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEDEB))
 				onInvoiceLineImputationDateDeb(ctx, mTab, value);
 			else if (columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEFIN))
 				onInvoiceLineImputationDateFin(ctx, mTab, value);
+		}
+		else if (tableName.equals(MLFRPaySelectionPrepayment.Table_Name)) {
+			if (columnName.equals(MLFRPaySelectionPrepayment.COLUMNNAME_C_Payment_ID))
+				onPaySelectionPrepaymentPaymentID(ctx, mTab, value);
 		}
 
 		return "";
@@ -90,4 +105,18 @@ public class LfrCallout implements IColumnCallout {
 			mTab.fireDataStatusEEvent("Warning", err, false);
 	}
 
+	private void onBPBankAccountBPartnerID(GridTab mTab, Object value) {
+		mTab.setValue(MBPBankAccount.COLUMNNAME_A_Name, value == null ? "" : DB.getSQLValueStringEx(null, "SELECT Name FROM C_BPartner WHERE C_BPartner_ID = ?", value));
+	}
+
+	private void onPaySelectionPrepaymentPaymentID(Properties ctx, GridTab mTab, Object value) {
+		if (value != null) {
+			MPayment p = new MPayment(ctx, (Integer) value, null);
+			int currentyToID = MBankAccount.get(ctx, (Integer) mTab.getParentTab().getValue("C_BankAccount_ID")).getC_Currency_ID();
+			BigDecimal amt = MConversionRate.convert (ctx, p.getPayAmt(), p.getC_Currency_ID(), currentyToID, p.getDateAcct(), 0, p.getAD_Client_ID(), 0);
+			mTab.setValue(MLFRPaySelectionPrepayment.COLUMNNAME_C_BPartner_ID, p.getC_BPartner_ID());
+			mTab.setValue(MLFRPaySelectionPrepayment.COLUMNNAME_PayAmt, amt);
+			mTab.setValue(MLFRPaySelectionPrepayment.COLUMNNAME_Description, p.getDescription());
+		}
+	}
 }
