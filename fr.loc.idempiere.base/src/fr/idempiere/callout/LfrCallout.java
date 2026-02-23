@@ -63,15 +63,15 @@ public class LfrCallout implements IColumnCallout {
 			if (columnName.equals(MBPBankAccount.COLUMNNAME_C_BPartner_ID) && mTab.getParentTab() == null)
 				onBPBankAccountBPartnerID(mTab, value);
 		}
+		else if (tableName.equals(MLFRPaySelectionPrepayment.Table_Name)) {
+			if (columnName.equals(MLFRPaySelectionPrepayment.COLUMNNAME_C_Payment_ID))
+				onPaySelectionPrepaymentPaymentID(ctx, mTab, value);
+		}
 		else if (tableName.equals(MInvoiceLine.Table_Name)) {
 			if (columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEDEB))
 				onInvoiceLineImputationDateDeb(ctx, mTab, value);
 			else if (columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEFIN))
 				onInvoiceLineImputationDateFin(ctx, mTab, value);
-		}
-		else if (tableName.equals(MLFRPaySelectionPrepayment.Table_Name)) {
-			if (columnName.equals(MLFRPaySelectionPrepayment.COLUMNNAME_C_Payment_ID))
-				onPaySelectionPrepaymentPaymentID(ctx, mTab, value);
 		}
 
 		return "";

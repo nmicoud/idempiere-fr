@@ -61,4 +61,4 @@ public class LFR_PaySelectionCreatePayment extends LfrProcess
 		return "@ProcessOK@";
 	} // doIt
 
-} // XXA_PaySelectionCreatePayment
+} // LFR_PaySelectionCreatePayment

@@ -98,4 +98,4 @@ public class LFR_PaySelectionExport extends LfrProcess
 		return "@ProcessOK@";
 	} // doIt
 
-} // XXA_PaySelectionExport
+} // LFR_PaySelectionExport

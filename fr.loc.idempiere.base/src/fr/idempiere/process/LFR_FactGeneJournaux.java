@@ -28,11 +28,8 @@ package fr.idempiere.process;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
-import java.util.logging.Level;
 
-import org.compiere.model.MClient;
 import org.compiere.model.MGLCategory;
-import org.compiere.model.MOrg;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -46,22 +43,18 @@ import fr.idempiere.model.MTLFRReport;
 /**
  *	Process de préparation des journaux de compta géné
  *	Les états jrxml lisent ensuite la table pour l'affichage des infos
- *  @author Nico
+ *  @author Nicolas Micoud - TGI
  */
 
-public class LFR_FactGeneJournaux extends LfrProcess {
+public class LFR_FactGeneJournaux extends LfrProcessFact {
 
-	private int			p_C_AcctSchema_ID = 0;
-	private int			p_AD_Org_ID = 0;
-	private String		p_PostingType = "";
 	private int			lines = 0;
-	private String 		orgName = ""; // l'organisation pour laquelle on a demandé l'édition ; différente de OrgTrxName, organisation de la ligne de compta
 	private int			p_GL_Category_ID = 0;
 	private Timestamp	p_DateAcct_From = null;
 	private Timestamp	p_DateAcct_To = null;
 	private boolean		p_isJournalCent = false;
 	private boolean		p_isGroupByRecord = false; // Regrouper les écritures par document (journal) - détermine le sql utilisé
-	private boolean		p_isAccountDetail = false; // Afficher par compte (journal centralisateur) - met à jour IsSummary dans T_XXA_Report
+	private boolean		p_isAccountDetail = false; // Afficher par compte (journal centralisateur) - met à jour IsSummary dans T_LFR_Report
 	private String		language = "";
 	private boolean		baseLanguage = false;
 
@@ -70,18 +63,14 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 	 */
 	protected void prepare()
 	{
+		super.prepare();
+		
 		ProcessInfoParameter[] para = getParameter();
 		for (int i = 0; i < para.length; i++) {
 			String name = para[i].getParameterName();
 			if (name.equals("LFR_IsJournalCentralisateur"))
 				p_isJournalCent = para[i].getParameterAsBoolean();
-			else if (name.equals("C_AcctSchema_ID"))
-				p_C_AcctSchema_ID = para[i].getParameterAsInt();
-			else if (name.equals("AD_Org_ID"))
-				p_AD_Org_ID = para[i].getParameterAsInt();
-			else if (name.equals("PostingType"))
-				p_PostingType = (String)para[i].getParameter();
-			else if (name.equals("DateAcct")) {
+			else if (name.equals("LFR_ProcessParaDateAcct")) {
 				p_DateAcct_From = para[i].getParameterAsTimestamp();
 				p_DateAcct_To = para[i].getParameter_ToAsTimestamp();
 			}
@@ -91,8 +80,6 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 				p_isGroupByRecord = para[i].getParameterAsBoolean();
 			else if (name.equals("LFR_IsAccountDetail"))
 				p_isAccountDetail = para[i].getParameterAsBoolean();
-			else
-				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 
 			language = Env.getAD_Language(Env.getCtx());
 		}
@@ -105,30 +92,24 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 	 */
 	protected String doIt () throws Exception
 	{
-		String clientName = MClient.get(getCtx(), getAD_Client_ID()).getName();
-		String reportTitle = ""; // le titre de l'état (repris dans le Page Header)
 		int sequenceID = MTLFRReport.getSequenceID(get_TrxName());
-		String footerCenter = "";
 
 		if (language.equals(Language.getBaseAD_Language()))
 			baseLanguage=true;
 
 		if (p_isGroupByRecord)
-			footerCenter = Msg.getMsg(getCtx(), "LFR_EcrituresGroupeesParCompte");
+			setFooterCenter(Msg.getMsg(getCtx(), "LFR_EcrituresGroupeesParCompte"));
 
 		// les paramètres optionnels
 		StringBuilder sqlWhere = new StringBuilder("");
-		if (p_AD_Org_ID > 0) {
-			orgName = MOrg.get(getCtx(), p_AD_Org_ID).getName();
-			sqlWhere.append(" AND fa.AD_Org_ID = " + p_AD_Org_ID);
-		}
+		sqlWhere.append(getSqlWhereOrg("fa"));
 
 		//Sélection des GL_Cat concernés par l'édition
 		StringBuilder sql1 = new StringBuilder("SELECT DISTINCT fa.GL_Category_ID, gl.Value")
 				.append(" FROM Fact_Acct fa")
 				.append(" INNER JOIN GL_Category gl ON (fa.GL_Category_ID = gl.GL_Category_ID)")
-				.append(" WHERE fa.C_AcctSchema_ID = ").append(p_C_AcctSchema_ID)
-				.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_PostingType))
+				.append(" WHERE fa.C_AcctSchema_ID = ").append(p_acctSchema_ID)
+				.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_postingType))
 				.append(sqlWhere);
 
 		if (p_DateAcct_From != null)
@@ -148,34 +129,37 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 			String code = gl.getValue();
 
 			MTLFRReport taf = null;
-			String printName = "";
+			String glCatDisplayName = "";
 			if (!Util.isEmpty(code))
-				printName = "(" + code + ") ";
-			printName += affich;
+				glCatDisplayName = "(" + code + ") ";
+			glCatDisplayName += affich;
 
-			String criteresDate = MTLFRReport.getDateCriteres(getCtx(), getAD_Client_ID(), p_DateAcct_From, p_DateAcct_To);
+			String criteresDate = getDateCriteres(getAD_Client_ID(), p_DateAcct_From, p_DateAcct_To);
+			resetReportTitle();
 
 			StringBuilder sql2 = new StringBuilder("");
 			if (!p_isJournalCent) {
-				reportTitle = Msg.getElement(getCtx(), "GL_Category_ID") + " " + affich + (Util.isEmpty(code) ? "" : " (" + code + ")");
+				forceTitleCenter(Msg.getElement(getCtx(), "GL_Category_ID") + " " + affich + (Util.isEmpty(code) ? "" : " (" + code + ")"));
+				String reportTitle = getReportTitle();
 
 				StringBuilder s_insert = new StringBuilder("INSERT INTO T_LFR_Report ")
 						.append("(T_LFR_Report_ID, AD_PInstance_ID, AD_Client_ID, AD_Org_ID, Created, CreatedBy, Updated, UpdatedBy, ")
-						.append(" Fact_Acct_ID, BPName, AccountValue, GL_Category_ID, AmtAcctDr, AmtAcctCr, DateAcct, Description,")
-						.append(" LFR_FactAcctOrg, Account_Name, PrintName, ClientName, OrgName, FooterCenter, Title, LFR_DateAsString/*, XXA_NumEcriture*/)"); // FEC
+						.append(" Fact_Acct_ID, BPName, AccountValue, GL_Category_ID, AmtAcctDr, AmtAcctCr, DateAcct, LFR_FactAcctDescription,")
+						.append(" LFR_FactAcctOrg, Account_Name, LFR_GLCategoryPrintName, ClientName, OrgName, FooterCenter, Title, LFR_DateAsString, LFR_NumEcriture, C_AcctSchema_ID, PostingType)");
 
 				if (p_isGroupByRecord) {
-					int dt_bs = MTLFRReport.getDocTypeForBankStatement(getCtx());
-					int dt_a = MTLFRReport.getDocTypeForAllocation(getCtx());
+					int dt_bs = getDocTypeForBankStatement();
+					int dt_a = getDocTypeForAllocation();
 
 					sql2.append(s_insert).append(" SELECT nextidfunc(" + sequenceID + ",'N'), ").append(getAD_PInstance_ID()).append(", ").append(getAD_Client_ID()).append(", ")
-					.append((p_AD_Org_ID > 0 ? p_AD_Org_ID : 0)).append(", SysDate, 0, SysDate, ").append(getAD_User_ID()).append(", ")
+					.append("0, SysDate, 0, SysDate, ").append(getAD_User_ID()).append(", ")
 							.append(" NULL, RESULT.BPName, RESULT.AccountValue,")
 							.append(" RESULT.GL_Category_ID, RESULT.AmtAcctDr, RESULT.AmtAcctCr, RESULT.DateAcct, RESULT.Description,")
 							.append(" NULL, RESULT.AccountName, ")	// pas d'organisation sur la ligne
-							.append(DB.TO_STRING(printName)).append(", ").append(DB.TO_STRING(clientName)).append(", ").append(DB.TO_STRING(orgName)).append(", ")
-							.append(DB.TO_STRING(footerCenter)).append(", ").append(DB.TO_STRING(reportTitle)).append(", ").append(DB.TO_STRING(criteresDate))
-							//+ ", RESULT.XXA_NumEcriture" FEC
+							.append(DB.TO_STRING(glCatDisplayName)).append(", ").append(DB.TO_STRING(getClientName())).append(", ").append(DB.TO_STRING(getOrgName())).append(", ")
+							.append(DB.TO_STRING(getFooterCenter())).append(", ").append(DB.TO_STRING(reportTitle)).append(", ").append(DB.TO_STRING(criteresDate))
+							.append(", RESULT.LFR_NumEcriture")
+							.append(", ").append(p_acctSchema_ID).append(", ").append(DB.TO_STRING(p_postingType))
 
 							.append(" FROM (SELECT bp.Name BPName, ev.Value AccountValue,")
 							.append(" fa.GL_Category_ID, SUM(fa.AmtAcctDr) AmtAcctDr, SUM(fa.AmtAcctCr) AmtAcctCr, fa.DateAcct, ")
@@ -186,8 +170,8 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 							.append(" WHEN fa.AD_Table_ID = 392 THEN dt.PrintName || ' ' || bs.Name")
 							.append(" WHEN fa.AD_Table_ID = 735 THEN dt.PrintName || ' ' || a.DocumentNo")
 							.append(" END Description,")
-							.append(" ev").append(baseLanguage ? "" : "t").append(".Name AccountName")	// on vient lire le nom du compte sur la table principale ou la table trl
-							//+ " COALESCE(fa.XXA_NumEcriture, 0) XXA_NumEcriture" FEC
+							.append(" ev").append(baseLanguage ? "" : "t").append(".Name AccountName,")	// on vient lire le nom du compte sur la table principale ou la table trl
+							.append(" COALESCE(pvf.LFR_NumEcriture, 0) LFR_NumEcriture")
 
 							.append(" FROM Fact_Acct fa")
 							.append(" LEFT OUTER JOIN C_Invoice i ON (fa.Record_ID = i.C_Invoice_ID AND fa.AD_Table_ID = 318)")
@@ -195,14 +179,15 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 							.append(" LEFT OUTER JOIN GL_Journal j ON (fa.Record_ID = j.GL_Journal_ID AND fa.AD_Table_ID = 224)")
 							.append(" LEFT OUTER JOIN C_BankStatement bs ON (fa.Record_ID = bs.C_BankStatement_ID AND fa.AD_Table_ID = 392)")
 							.append(" LEFT OUTER JOIN C_AllocationHdr a ON (fa.Record_ID = a.C_AllocationHdr_ID AND fa.AD_Table_ID = 735)")
-							.append(" LEFT OUTER JOIN C_BPartner bp ON (fa.C_BPartner_ID = bp.C_BPartner_ID AND fa.AD_Table_ID <> 392),") // on ne prend pas en compte le tiers figurant sur le rapprochement bancaire (empêche le group by)
+							.append(" LEFT OUTER JOIN C_BPartner bp ON (fa.C_BPartner_ID = bp.C_BPartner_ID AND fa.AD_Table_ID <> 392)") // on ne prend pas en compte le tiers figurant sur le rapprochement bancaire (empêche le group by)
+							.append(" LEFT OUTER JOIN LFR_PeriodValidationFact pvf ON (fa.Fact_Acct_ID = pvf.Fact_Acct_ID),")
 							.append(" AD_Client c, AD_Org o, GL_Category gl, C_ElementValue ev, " + (baseLanguage ? "" : "C_ElementValue_Trl evt, "))
 							.append(" C_DocType").append((baseLanguage ? "" : "_Trl ") + " dt")	// soit C_DocType soit C_DocType_Trl
 
 							.append(" WHERE fa.AD_Client_ID = c.AD_Client_ID")
 							.append(" AND fa.AD_Org_ID = o.AD_Org_ID")
 							.append(" AND fa.GL_Category_ID = gl.GL_Category_ID")
-							.append(" AND fa.C_AcctSchema_ID = ").append(p_C_AcctSchema_ID)
+							.append(" AND fa.C_AcctSchema_ID = ").append(p_acctSchema_ID)
 							.append(" AND fa.Account_ID = ev.C_ElementValue_ID ")
 							.append(baseLanguage ? "" : " AND fa.Account_ID = evt.C_ElementValue_ID AND evt.AD_Language= " + DB.TO_STRING(language))
 							// DocTypeName et N° doc
@@ -214,41 +199,43 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 							.append(" OR (fa.AD_Table_ID = 735 AND dt.C_DocType_ID = " + dt_a + "))")
 							.append((baseLanguage ? "" : " AND dt.AD_Language=" + DB.TO_STRING(language)))
 
-							.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_PostingType)).append(sqlWhere);
+							.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_postingType)).append(sqlWhere);
 					if (p_DateAcct_From != null)
 						sql2.append(" AND fa.DateAcct >= ").append(DB.TO_DATE(p_DateAcct_From, true));
 					if (p_DateAcct_To != null)
 						sql2.append(" AND fa.DateAcct <= ").append(DB.TO_DATE(p_DateAcct_To, true));
 					sql2.append(" AND fa.GL_Category_ID = " + glCatID)
 					.append(" GROUP BY fa.GL_Category_ID, fa.DateAcct, ev.Value, fa.Account_ID, fa.AD_Table_ID, fa.Record_ID, bp.Name, ev").append((baseLanguage ? "" : "t")) .append(".Name, ")
-					.append("dt.printname, i.DocumentNo, p.DocumentNo, j.DocumentNo, bs.Name, a.DocumentNo/*, fa.XXA_NumEcriture*/") // FEC
+					.append("dt.printname, i.DocumentNo, p.DocumentNo, j.DocumentNo, bs.Name, a.DocumentNo, pvf.LFR_NumEcriture")
 					.append(" ORDER BY fa.DateAcct, fa.Record_ID, ev.Value")
 					.append(") RESULT");
 				} else { // pas de regroupement
 					sql2.append(s_insert).append(" SELECT nextidfunc(" + sequenceID + ",'N'), ").append(getAD_PInstance_ID()).append(", ").append(getAD_Client_ID()).append(", ")
-					.append(p_AD_Org_ID > 0 ? p_AD_Org_ID : 0).append(", SysDate, 0, SysDate, ").append(getAD_User_ID()).append(", ")
+					.append("0, SysDate, 0, SysDate, ").append(getAD_User_ID()).append(", ")
 					.append(" RESULT.Fact_Acct_ID, RESULT.BPName, RESULT.AccountValue,")
 					.append(" RESULT.GL_Category_ID, RESULT.AmtAcctDr, RESULT.AmtAcctCr, RESULT.DateAcct, RESULT.Description,")
 					.append(" RESULT.OrgName, RESULT.AccountName, ")
-					.append(DB.TO_STRING(printName)).append(", ").append(DB.TO_STRING(clientName)).append(", ").append(DB.TO_STRING(orgName)).append(", ")
-					.append(DB.TO_STRING(footerCenter)).append(", ").append(DB.TO_STRING(reportTitle)).append(", ").append(DB.TO_STRING(criteresDate))
-							//+ ", RESULT.XXA_NumEcriture " FEC
+					.append(DB.TO_STRING(glCatDisplayName)).append(", ").append(DB.TO_STRING(getClientName())).append(", ").append(DB.TO_STRING(getOrgName())).append(", ")
+					.append(DB.TO_STRING(getFooterCenter())).append(", ").append(DB.TO_STRING(reportTitle)).append(", ").append(DB.TO_STRING(criteresDate))
+					.append(", RESULT.LFR_NumEcriture")
+					.append(", ").append(p_acctSchema_ID).append(", ").append(DB.TO_STRING(p_postingType))
 
 					.append(" FROM (SELECT fa.Fact_Acct_ID, bp.Name BPName, ev.Value AccountValue,")
 					.append(" fa.GL_Category_ID, fa.AmtAcctDr, fa.AmtAcctCr, fa.DateAcct, fa.Description,")
 					.append(" o.Name OrgName, ev").append((baseLanguage ? "" : "t")).append(".Name AccountName")
-							//+ ", COALESCE(fa.XXA_NumEcriture, 0) XXA_NumEcriture" FEC
+					.append(", COALESCE(pvf.LFR_NumEcriture, 0) LFR_NumEcriture")
 
 					.append(" FROM Fact_Acct fa")
 					.append(" LEFT OUTER JOIN C_BPartner bp ON (fa.C_BPartner_ID = bp.C_BPartner_ID)")
+					.append(" LEFT OUTER JOIN LFR_PeriodValidationFact pvf ON (fa.Fact_Acct_ID = pvf.Fact_Acct_ID)")
 					.append(", AD_Client c, AD_Org o, GL_Category gl, C_ElementValue ev").append(baseLanguage ? "" : ", C_ElementValue_Trl evt")
 					.append(" WHERE fa.AD_Client_ID = c.AD_Client_ID")
 					.append(" AND fa.AD_Org_ID = o.AD_Org_ID")
 					.append(" AND fa.GL_Category_ID = gl.GL_Category_ID")
-					.append(" AND fa.C_AcctSchema_ID = ").append(p_C_AcctSchema_ID)
+					.append(" AND fa.C_AcctSchema_ID = ").append(p_acctSchema_ID)
 					.append(" AND fa.Account_ID = ev.C_ElementValue_ID ")
 					.append((baseLanguage ? "" : " AND fa.Account_ID = evt.C_ElementValue_ID AND evt.AD_Language=" + DB.TO_STRING(language)))
-					.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_PostingType)).append(sqlWhere);
+					.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_postingType)).append(sqlWhere);
 					if (p_DateAcct_From != null)
 						sql2.append(" AND fa.DateAcct >= " + DB.TO_DATE(p_DateAcct_From, true));
 					if (p_DateAcct_To != null)
@@ -259,7 +246,7 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 				}
 			} else { // journal centralisateur
 				
-				reportTitle = "Journal Centralisateur";
+				forceTitleCenter("Journal Centralisateur");
 				
 				StringBuilder groupByClause = new StringBuilder(" GROUP BY fa.GL_Category_ID, gl.PrintName");
 				if (p_isAccountDetail)
@@ -275,8 +262,8 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 
 				sql2.append(" FROM RV_Fact_Acct fa, GL_Category gl")
 				.append(" WHERE fa.GL_Category_ID = gl.GL_Category_ID")
-				.append(" AND fa.C_AcctSchema_ID = ").append(p_C_AcctSchema_ID) 
-				.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_PostingType)).append(sqlWhere);
+				.append(" AND fa.C_AcctSchema_ID = ").append(p_acctSchema_ID) 
+				.append(" AND fa.PostingType = ").append(DB.TO_STRING(p_postingType)).append(sqlWhere);
 				if (p_DateAcct_From != null)
 					sql2.append(" AND fa.DateAcct >= ").append(DB.TO_DATE(p_DateAcct_From, true));
 				if (p_DateAcct_To != null)
@@ -299,15 +286,15 @@ public class LFR_FactGeneJournaux extends LfrProcess {
 
 					while (rs2.next()) {
 						taf = new MTLFRReport(getCtx(), 0, getAD_PInstance_ID(), get_TrxName());
-						taf.setClientName(clientName);
-						taf.setOrgName(orgName);
+						taf.setClientName(getClientName());
+						taf.setOrgName(getOrgName());
+						taf.setC_AcctSchema_ID(p_acctSchema_ID);
+						taf.setPostingType(p_postingType);
 						taf.setLine(lines++);
-						if (p_AD_Org_ID > 0)
-							taf.setAD_Org_ID(p_AD_Org_ID);
-						taf.setPrintName(printName);
+						taf.setLFR_GLCategoryPrintName(glCatDisplayName);
 						taf.setLFR_DateAsString(criteresDate);
-						taf.setTitle(reportTitle);
-						taf.setFooterCenter(footerCenter);
+						taf.setTitle(getReportTitle());
+						taf.setFooterCenter(getFooterCenter());
 						taf.setGL_Category_ID(rs2.getInt(1));
 						taf.setAmtAcctDr(rs2.getBigDecimal(2));
 						taf.setAmtAcctCr(rs2.getBigDecimal(3));

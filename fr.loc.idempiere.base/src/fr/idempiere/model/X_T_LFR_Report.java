@@ -25,16 +25,16 @@ import org.compiere.model.*;
 import org.compiere.util.Env;
 
 /** Generated Model for T_LFR_Report
- *  @author iDempiere (generated) 
- *  @version Release 10 - $Id$ */
+ *  @author iDempiere (generated)
+ *  @version Release 12 - $Id$ */
 @org.adempiere.base.Model(table="T_LFR_Report")
-public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent 
+public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20221230L;
+	private static final long serialVersionUID = 20260223L;
 
     /** Standard Constructor */
     public X_T_LFR_Report (Properties ctx, int T_LFR_Report_ID, String trxName)
@@ -42,6 +42,8 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
       super (ctx, T_LFR_Report_ID, trxName);
       /** if (T_LFR_Report_ID == 0)
         {
+			setIsSummary (false);
+// N
 			setT_LFR_Report_ID (0);
         } */
     }
@@ -52,6 +54,32 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
       super (ctx, T_LFR_Report_ID, trxName, virtualColumns);
       /** if (T_LFR_Report_ID == 0)
         {
+			setIsSummary (false);
+// N
+			setT_LFR_Report_ID (0);
+        } */
+    }
+
+    /** Standard Constructor */
+    public X_T_LFR_Report (Properties ctx, String T_LFR_Report_UU, String trxName)
+    {
+      super (ctx, T_LFR_Report_UU, trxName);
+      /** if (T_LFR_Report_UU == null)
+        {
+			setIsSummary (false);
+// N
+			setT_LFR_Report_ID (0);
+        } */
+    }
+
+    /** Standard Constructor */
+    public X_T_LFR_Report (Properties ctx, String T_LFR_Report_UU, String trxName, String ... virtualColumns)
+    {
+      super (ctx, T_LFR_Report_UU, trxName, virtualColumns);
+      /** if (T_LFR_Report_UU == null)
+        {
+			setIsSummary (false);
+// N
 			setT_LFR_Report_ID (0);
         } */
     }
@@ -63,7 +91,7 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
     }
 
     /** AccessLevel
-      * @return 7 - System - Client - Org 
+      * @return 7 - System - Client - Org
       */
     protected int get_AccessLevel()
     {
@@ -83,37 +111,6 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
         .append(get_ID()).append("]");
       return sb.toString();
     }
-
-	/** Set Account Name.
-		@param Account_Name Account Name
-	*/
-	public void setAccount_Name (String Account_Name)
-	{
-		set_ValueNoCheck (COLUMNNAME_Account_Name, Account_Name);
-	}
-
-	/** Get Account Name.
-		@return Account Name	  */
-	public String getAccount_Name()
-	{
-		return (String)get_Value(COLUMNNAME_Account_Name);
-	}
-
-	/** Set Account Key.
-		@param AccountValue Key of Account Element
-	*/
-	public void setAccountValue (String AccountValue)
-	{
-		set_ValueNoCheck (COLUMNNAME_AccountValue, AccountValue);
-	}
-
-	/** Get Account Key.
-		@return Key of Account Element
-	  */
-	public String getAccountValue()
-	{
-		return (String)get_Value(COLUMNNAME_AccountValue);
-	}
 
 	public org.compiere.model.I_AD_PInstance getAD_PInstance() throws RuntimeException
 	{
@@ -141,6 +138,37 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Account Key.
+		@param AccountValue Key of Account Element
+	*/
+	public void setAccountValue (String AccountValue)
+	{
+		set_ValueNoCheck (COLUMNNAME_AccountValue, AccountValue);
+	}
+
+	/** Get Account Key.
+		@return Key of Account Element
+	  */
+	public String getAccountValue()
+	{
+		return (String)get_Value(COLUMNNAME_AccountValue);
+	}
+
+	/** Set Account Name.
+		@param Account_Name Account Name
+	*/
+	public void setAccount_Name (String Account_Name)
+	{
+		set_ValueNoCheck (COLUMNNAME_Account_Name, Account_Name);
+	}
+
+	/** Get Account Name.
+		@return Account Name	  */
+	public String getAccount_Name()
+	{
+		return (String)get_Value(COLUMNNAME_Account_Name);
 	}
 
 	/** Set Accounted Amount.
@@ -213,6 +241,62 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 	public String getBPName()
 	{
 		return (String)get_Value(COLUMNNAME_BPName);
+	}
+
+	public org.compiere.model.I_C_AcctSchema getC_AcctSchema() throws RuntimeException
+	{
+		return (org.compiere.model.I_C_AcctSchema)MTable.get(getCtx(), org.compiere.model.I_C_AcctSchema.Table_ID)
+			.getPO(getC_AcctSchema_ID(), get_TrxName());
+	}
+
+	/** Set Accounting Schema.
+		@param C_AcctSchema_ID Rules for accounting
+	*/
+	public void setC_AcctSchema_ID (int C_AcctSchema_ID)
+	{
+		if (C_AcctSchema_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_C_AcctSchema_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_C_AcctSchema_ID, Integer.valueOf(C_AcctSchema_ID));
+	}
+
+	/** Get Accounting Schema.
+		@return Rules for accounting
+	  */
+	public int getC_AcctSchema_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_AcctSchema_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException
+	{
+		return (org.compiere.model.I_C_BPartner)MTable.get(getCtx(), org.compiere.model.I_C_BPartner.Table_ID)
+			.getPO(getC_BPartner_ID(), get_TrxName());
+	}
+
+	/** Set Business Partner.
+		@param C_BPartner_ID Identifies a Business Partner
+	*/
+	public void setC_BPartner_ID (int C_BPartner_ID)
+	{
+		if (C_BPartner_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_ID, Integer.valueOf(C_BPartner_ID));
+	}
+
+	/** Get Business Partner.
+		@return Identifies a Business Partner
+	  */
+	public int getC_BPartner_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_BPartner_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	public org.compiere.model.I_C_ElementValue getC_ElementValue() throws RuntimeException
@@ -290,6 +374,22 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 		return (String)get_Value(COLUMNNAME_Description);
 	}
 
+	/** Set Document Type Name.
+		@param DocTypeName Name of the Document Type
+	*/
+	public void setDocTypeName (String DocTypeName)
+	{
+		set_Value (COLUMNNAME_DocTypeName, DocTypeName);
+	}
+
+	/** Get Document Type Name.
+		@return Name of the Document Type
+	  */
+	public String getDocTypeName()
+	{
+		return (String)get_Value(COLUMNNAME_DocTypeName);
+	}
+
 	public org.compiere.model.I_Fact_Acct getFact_Acct() throws RuntimeException
 	{
 		return (org.compiere.model.I_Fact_Acct)MTable.get(getCtx(), org.compiere.model.I_Fact_Acct.Table_ID)
@@ -361,6 +461,22 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 		return ii.intValue();
 	}
 
+	/** Set Header Center.
+		@param HeaderCenter Content of the center portion of the header.
+	*/
+	public void setHeaderCenter (String HeaderCenter)
+	{
+		set_Value (COLUMNNAME_HeaderCenter, HeaderCenter);
+	}
+
+	/** Get Header Center.
+		@return Content of the center portion of the header.
+	  */
+	public String getHeaderCenter()
+	{
+		return (String)get_Value(COLUMNNAME_HeaderCenter);
+	}
+
 	/** Set Summary Level.
 		@param IsSummary This is a summary entity
 	*/
@@ -375,10 +491,10 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 	public boolean isSummary()
 	{
 		Object oo = get_Value(COLUMNNAME_IsSummary);
-		if (oo != null) 
+		if (oo != null)
 		{
-			 if (oo instanceof Boolean) 
-				 return ((Boolean)oo).booleanValue(); 
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
 			return "Y".equals(oo);
 		}
 		return false;
@@ -436,6 +552,201 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
+	}
+
+	/** Set LFR_AmtDebutCr.
+		@param LFR_AmtDebutCr LFR_AmtDebutCr
+	*/
+	public void setLFR_AmtDebutCr (BigDecimal LFR_AmtDebutCr)
+	{
+		set_Value (COLUMNNAME_LFR_AmtDebutCr, LFR_AmtDebutCr);
+	}
+
+	/** Get LFR_AmtDebutCr.
+		@return LFR_AmtDebutCr	  */
+	public BigDecimal getLFR_AmtDebutCr()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtDebutCr);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_AmtDebutDr.
+		@param LFR_AmtDebutDr LFR_AmtDebutDr
+	*/
+	public void setLFR_AmtDebutDr (BigDecimal LFR_AmtDebutDr)
+	{
+		set_Value (COLUMNNAME_LFR_AmtDebutDr, LFR_AmtDebutDr);
+	}
+
+	/** Get LFR_AmtDebutDr.
+		@return LFR_AmtDebutDr	  */
+	public BigDecimal getLFR_AmtDebutDr()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtDebutDr);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_AmtFinalCr.
+		@param LFR_AmtFinalCr LFR_AmtFinalCr
+	*/
+	public void setLFR_AmtFinalCr (BigDecimal LFR_AmtFinalCr)
+	{
+		set_Value (COLUMNNAME_LFR_AmtFinalCr, LFR_AmtFinalCr);
+	}
+
+	/** Get LFR_AmtFinalCr.
+		@return LFR_AmtFinalCr	  */
+	public BigDecimal getLFR_AmtFinalCr()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtFinalCr);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_AmtFinalDr.
+		@param LFR_AmtFinalDr LFR_AmtFinalDr
+	*/
+	public void setLFR_AmtFinalDr (BigDecimal LFR_AmtFinalDr)
+	{
+		set_Value (COLUMNNAME_LFR_AmtFinalDr, LFR_AmtFinalDr);
+	}
+
+	/** Get LFR_AmtFinalDr.
+		@return LFR_AmtFinalDr	  */
+	public BigDecimal getLFR_AmtFinalDr()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtFinalDr);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_AmtPeriodeDef.
+		@param LFR_AmtPeriodeDef LFR_AmtPeriodeDef
+	*/
+	public void setLFR_AmtPeriodeDef (BigDecimal LFR_AmtPeriodeDef)
+	{
+		set_ValueNoCheck (COLUMNNAME_LFR_AmtPeriodeDef, LFR_AmtPeriodeDef);
+	}
+
+	/** Get LFR_AmtPeriodeDef.
+		@return LFR_AmtPeriodeDef	  */
+	public BigDecimal getLFR_AmtPeriodeDef()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtPeriodeDef);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_AmtPeriodeDefCr.
+		@param LFR_AmtPeriodeDefCr LFR_AmtPeriodeDefCr
+	*/
+	public void setLFR_AmtPeriodeDefCr (BigDecimal LFR_AmtPeriodeDefCr)
+	{
+		set_ValueNoCheck (COLUMNNAME_LFR_AmtPeriodeDefCr, LFR_AmtPeriodeDefCr);
+	}
+
+	/** Get LFR_AmtPeriodeDefCr.
+		@return LFR_AmtPeriodeDefCr	  */
+	public BigDecimal getLFR_AmtPeriodeDefCr()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtPeriodeDefCr);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_AmtPeriodeDefDr.
+		@param LFR_AmtPeriodeDefDr LFR_AmtPeriodeDefDr
+	*/
+	public void setLFR_AmtPeriodeDefDr (BigDecimal LFR_AmtPeriodeDefDr)
+	{
+		set_ValueNoCheck (COLUMNNAME_LFR_AmtPeriodeDefDr, LFR_AmtPeriodeDefDr);
+	}
+
+	/** Get LFR_AmtPeriodeDefDr.
+		@return LFR_AmtPeriodeDefDr	  */
+	public BigDecimal getLFR_AmtPeriodeDefDr()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtPeriodeDefDr);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_AmtPeriodeTemp.
+		@param LFR_AmtPeriodeTemp LFR_AmtPeriodeTemp
+	*/
+	public void setLFR_AmtPeriodeTemp (BigDecimal LFR_AmtPeriodeTemp)
+	{
+		set_ValueNoCheck (COLUMNNAME_LFR_AmtPeriodeTemp, LFR_AmtPeriodeTemp);
+	}
+
+	/** Get LFR_AmtPeriodeTemp.
+		@return LFR_AmtPeriodeTemp	  */
+	public BigDecimal getLFR_AmtPeriodeTemp()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtPeriodeTemp);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_AmtPeriodeTempCr.
+		@param LFR_AmtPeriodeTempCr LFR_AmtPeriodeTempCr
+	*/
+	public void setLFR_AmtPeriodeTempCr (BigDecimal LFR_AmtPeriodeTempCr)
+	{
+		set_ValueNoCheck (COLUMNNAME_LFR_AmtPeriodeTempCr, LFR_AmtPeriodeTempCr);
+	}
+
+	/** Get LFR_AmtPeriodeTempCr.
+		@return LFR_AmtPeriodeTempCr	  */
+	public BigDecimal getLFR_AmtPeriodeTempCr()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtPeriodeTempCr);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_AmtPeriodeTempDr.
+		@param LFR_AmtPeriodeTempDr LFR_AmtPeriodeTempDr
+	*/
+	public void setLFR_AmtPeriodeTempDr (BigDecimal LFR_AmtPeriodeTempDr)
+	{
+		set_ValueNoCheck (COLUMNNAME_LFR_AmtPeriodeTempDr, LFR_AmtPeriodeTempDr);
+	}
+
+	/** Get LFR_AmtPeriodeTempDr.
+		@return LFR_AmtPeriodeTempDr	  */
+	public BigDecimal getLFR_AmtPeriodeTempDr()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_AmtPeriodeTempDr);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set LFR_BPartnerDisplayName.
+		@param LFR_BPartnerDisplayName LFR_BPartnerDisplayName
+	*/
+	public void setLFR_BPartnerDisplayName (String LFR_BPartnerDisplayName)
+	{
+		set_ValueNoCheck (COLUMNNAME_LFR_BPartnerDisplayName, LFR_BPartnerDisplayName);
+	}
+
+	/** Get LFR_BPartnerDisplayName.
+		@return LFR_BPartnerDisplayName	  */
+	public String getLFR_BPartnerDisplayName()
+	{
+		return (String)get_Value(COLUMNNAME_LFR_BPartnerDisplayName);
 	}
 
 	/** Set LFR_BalanceGeneRegrLevel.
@@ -513,6 +824,21 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 		return (String)get_Value(COLUMNNAME_LFR_DateAsString);
 	}
 
+	/** Set LFR_FactAcctDescription.
+		@param LFR_FactAcctDescription LFR_FactAcctDescription
+	*/
+	public void setLFR_FactAcctDescription (String LFR_FactAcctDescription)
+	{
+		set_Value (COLUMNNAME_LFR_FactAcctDescription, LFR_FactAcctDescription);
+	}
+
+	/** Get LFR_FactAcctDescription.
+		@return LFR_FactAcctDescription	  */
+	public String getLFR_FactAcctDescription()
+	{
+		return (String)get_Value(COLUMNNAME_LFR_FactAcctDescription);
+	}
+
 	/** Set LFR_FactAcctOrg.
 		@param LFR_FactAcctOrg LFR_FactAcctOrg
 	*/
@@ -526,6 +852,87 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 	public String getLFR_FactAcctOrg()
 	{
 		return (String)get_Value(COLUMNNAME_LFR_FactAcctOrg);
+	}
+
+	/** Set LFR_GLCategoryPrintName.
+		@param LFR_GLCategoryPrintName LFR_GLCategoryPrintName
+	*/
+	public void setLFR_GLCategoryPrintName (String LFR_GLCategoryPrintName)
+	{
+		set_Value (COLUMNNAME_LFR_GLCategoryPrintName, LFR_GLCategoryPrintName);
+	}
+
+	/** Get LFR_GLCategoryPrintName.
+		@return LFR_GLCategoryPrintName	  */
+	public String getLFR_GLCategoryPrintName()
+	{
+		return (String)get_Value(COLUMNNAME_LFR_GLCategoryPrintName);
+	}
+
+	/** Set LFR_MatchCode.
+		@param LFR_MatchCode LFR_MatchCode
+	*/
+	public void setLFR_MatchCode (String LFR_MatchCode)
+	{
+		set_Value (COLUMNNAME_LFR_MatchCode, LFR_MatchCode);
+	}
+
+	/** Get LFR_MatchCode.
+		@return LFR_MatchCode	  */
+	public String getLFR_MatchCode()
+	{
+		return (String)get_Value(COLUMNNAME_LFR_MatchCode);
+	}
+
+	/** Set LFR_NumEcriture.
+		@param LFR_NumEcriture LFR_NumEcriture
+	*/
+	public void setLFR_NumEcriture (int LFR_NumEcriture)
+	{
+		set_ValueNoCheck (COLUMNNAME_LFR_NumEcriture, Integer.valueOf(LFR_NumEcriture));
+	}
+
+	/** Get LFR_NumEcriture.
+		@return LFR_NumEcriture	  */
+	public int getLFR_NumEcriture()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_LFR_NumEcriture);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set LFR_ReconciliationDate.
+		@param LFR_ReconciliationDate LFR_ReconciliationDate
+	*/
+	public void setLFR_ReconciliationDate (Timestamp LFR_ReconciliationDate)
+	{
+		set_ValueNoCheck (COLUMNNAME_LFR_ReconciliationDate, LFR_ReconciliationDate);
+	}
+
+	/** Get LFR_ReconciliationDate.
+		@return LFR_ReconciliationDate	  */
+	public Timestamp getLFR_ReconciliationDate()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_LFR_ReconciliationDate);
+	}
+
+	/** Set LFR_SoldeProgressif.
+		@param LFR_SoldeProgressif LFR_SoldeProgressif
+	*/
+	public void setLFR_SoldeProgressif (BigDecimal LFR_SoldeProgressif)
+	{
+		set_Value (COLUMNNAME_LFR_SoldeProgressif, LFR_SoldeProgressif);
+	}
+
+	/** Get LFR_SoldeProgressif.
+		@return LFR_SoldeProgressif	  */
+	public BigDecimal getLFR_SoldeProgressif()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_LFR_SoldeProgressif);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Line No.
@@ -561,6 +968,35 @@ public class X_T_LFR_Report extends PO implements I_T_LFR_Report, I_Persistent
 	public String getOrgName()
 	{
 		return (String)get_Value(COLUMNNAME_OrgName);
+	}
+
+	/** PostingType AD_Reference_ID=125 */
+	public static final int POSTINGTYPE_AD_Reference_ID=125;
+	/** Actual = A */
+	public static final String POSTINGTYPE_Actual = "A";
+	/** Budget = B */
+	public static final String POSTINGTYPE_Budget = "B";
+	/** Commitment = E */
+	public static final String POSTINGTYPE_Commitment = "E";
+	/** Reservation = R */
+	public static final String POSTINGTYPE_Reservation = "R";
+	/** Statistical = S */
+	public static final String POSTINGTYPE_Statistical = "S";
+	/** Set Posting Type.
+		@param PostingType The type of posted amount for the transaction
+	*/
+	public void setPostingType (String PostingType)
+	{
+
+		set_ValueNoCheck (COLUMNNAME_PostingType, PostingType);
+	}
+
+	/** Get Posting Type.
+		@return The type of posted amount for the transaction
+	  */
+	public String getPostingType()
+	{
+		return (String)get_Value(COLUMNNAME_PostingType);
 	}
 
 	/** Set Print Text.

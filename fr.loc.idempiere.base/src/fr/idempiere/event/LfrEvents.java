@@ -62,6 +62,7 @@ import fr.idempiere.util.LfrFactReconciliationUtil;
 import fr.idempiere.util.LfrUtil;
 import fr.idempiere.util.SEPAPaymentExport;
 
+
 public class LfrEvents extends AbstractEventHandler {
 
 	@Override
@@ -79,7 +80,7 @@ public class LfrEvents extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_AFTER_POST, MInvoice.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_POST, MPayment.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_POST, MAllocationHdr.Table_Name);
-
+		
 		registerProcessEvent(IEventTopics.AFTER_PROCESS, "org.compiere.process.PaySelectionCreateFrom");
 
 	}
@@ -99,7 +100,7 @@ public class LfrEvents extends AbstractEventHandler {
 		if (event.getProperty(IEventManager.EVENT_DATA) instanceof PO) {
 			PO po = getPO(event);
 
-			if (topic.equals(IEventTopics.DOC_AFTER_POST)) {
+			if (topic.equals(IEventTopics.DOC_AFTER_POST) && LfrFactReconciliationUtil.isUseImmediateReconciliation(po.getAD_Client_ID())) {
 				if (po.get_TableName().equals(MInvoice.Table_Name)) {
 					LfrFactReconciliationUtil.factReconcile(po);
 				}
@@ -111,7 +112,7 @@ public class LfrEvents extends AbstractEventHandler {
 					MAllocationHdr alloc = (MAllocationHdr) po;
 					MAcctSchema[] ass = MAcctSchema.getClientAcctSchema(po.getCtx(), po.getAD_Client_ID());
 					for (MAcctSchema as : ass) {
-						LfrFactReconciliationUtil.LettrageAlloc(po.getCtx(), alloc, alloc.getAD_Client_ID(), as.getC_AcctSchema_ID(), -1, po.get_TrxName());
+						LfrFactReconciliationUtil.lettrageAlloc(po.getCtx(), alloc, as.getC_AcctSchema_ID(), -1, po.get_TrxName());
 					}
 				}
 			}
@@ -127,8 +128,9 @@ public class LfrEvents extends AbstractEventHandler {
 					if (!Util.isEmpty(err))
 						throw new AdempiereException(err);
 				}
-			}
-			else if (po.get_TableName().equals(MPayment.Table_Name)) {
+			} // Fin lettrage
+
+			if (po.get_TableName().equals(MPayment.Table_Name)) {
 
 				MPayment p = (MPayment) po;
 
@@ -223,6 +225,13 @@ public class LfrEvents extends AbstractEventHandler {
 								}
 							}
 						}
+
+						// Message si présence d'un règlement ou d'un avoir non affecté
+						if (DB.getSQLValueEx(trxName, "SELECT 1 FROM C_Payment WHERE C_BPartner_ID = ? AND IsAllocated = 'N' AND DocStatus IN ('CO', 'CL')", bp.getC_BPartner_ID()) == 1)
+							pi.addLog(0, null, null, bp.getName() + " a au moins un règlement non affecté");
+						if (DB.getSQLValueEx(trxName, "SELECT 1 FROM C_Invoice i WHERE i.C_BPartner_ID = ? AND i.IsPaid = 'N' AND i.DocStatus IN ('CO', 'CL')"
+								+ " AND i.C_DocType_ID IN (SELECT dt.C_DocType_ID FROM C_DocType dt WHERE dt.AD_Client_ID = i.AD_Client_ID AND charat(DocBaseType, 3) = 'C')", bp.getC_BPartner_ID()) == 1)
+							pi.addLog(0, null, null, bp.getName() + " a au moins un avoir non affecté");
 
 						listBPartners.add(bp.getC_BPartner_ID());
 					}

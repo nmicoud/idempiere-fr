@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.17.0-6d93193241dd8cc42629e188b94f9e0bc5722efd  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Journaux" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" resourceBundle="localization" uuid="8bf32277-a285-4433-b523-be85555160e9">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GrandLivreGene" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" resourceBundle="localization" uuid="4fb4eedf-6f46-4dc8-a564-60e0daa1fd5f">
 	<property name="ireport.scriptlethandling" value="0"/>
 	<property name="ireport.encoding" value="UTF-8"/>
-	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.zoom" value="2.049040366095212"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="explightwip@nicorcl"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="311"/>
-	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="679"/>
-	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="184"/>
-	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="811"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="127"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="867"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
 	<parameter name="AD_PINSTANCE_ID" class="java.lang.Integer"/>
 	<queryString>
-		<![CDATA[SELECT AmtAcctDr, AmtAcctCr, ClientName, GL_Category_ID, OrgName, Title, LFR_DateAsString, LFR_FactAcctDescription, DateAcct, LFR_FactAcctOrg, AccountValue, BPName, FooterCenter, LFR_NumEcriture
+		<![CDATA[SELECT AmtAcctDr, AmtAcctCr, LFR_SoldeProgressif, C_ElementValue_ID, HeaderCenter, ClientName, OrgName, Title, LFR_DateAsString, LFR_FactAcctDescription, DateAcct, LFR_FactAcctOrg, LFR_GLCategoryPrintName, FooterCenter, LFR_NumEcriture
 FROM T_LFR_Report
 WHERE AD_PInstance_ID = $P{AD_PINSTANCE_ID}
-ORDER BY PrintName, T_LFR_Report_ID]]>
+ORDER BY T_LFR_Report_ID]]>
 	</queryString>
 	<field name="AMTACCTDR" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="AMTACCTDR"/>
@@ -30,13 +28,21 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 		<property name="com.jaspersoft.studio.field.name" value="AMTACCTCR"/>
 		<property name="com.jaspersoft.studio.field.label" value="AMTACCTCR"/>
 	</field>
+	<field name="LFR_SOLDEPROGRESSIF" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="LFR_SOLDEPROGRESSIF"/>
+		<property name="com.jaspersoft.studio.field.label" value="LFR_SOLDEPROGRESSIF"/>
+	</field>
+	<field name="C_ELEMENTVALUE_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="C_ELEMENTVALUE_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="C_ELEMENTVALUE_ID"/>
+	</field>
+	<field name="HEADERCENTER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="HEADERCENTER"/>
+		<property name="com.jaspersoft.studio.field.label" value="HEADERCENTER"/>
+	</field>
 	<field name="CLIENTNAME" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="CLIENTNAME"/>
 		<property name="com.jaspersoft.studio.field.label" value="CLIENTNAME"/>
-	</field>
-	<field name="GL_CATEGORY_ID" class="java.math.BigDecimal">
-		<property name="com.jaspersoft.studio.field.name" value="GL_CATEGORY_ID"/>
-		<property name="com.jaspersoft.studio.field.label" value="GL_CATEGORY_ID"/>
 	</field>
 	<field name="ORGNAME" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="ORGNAME"/>
@@ -62,13 +68,9 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 		<property name="com.jaspersoft.studio.field.name" value="LFR_FACTACCTORG"/>
 		<property name="com.jaspersoft.studio.field.label" value="LFR_FACTACCTORG"/>
 	</field>
-	<field name="ACCOUNTVALUE" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="ACCOUNTVALUE"/>
-		<property name="com.jaspersoft.studio.field.label" value="ACCOUNTVALUE"/>
-	</field>
-	<field name="BPNAME" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="BPNAME"/>
-		<property name="com.jaspersoft.studio.field.label" value="BPNAME"/>
+	<field name="LFR_GLCATEGORYPRINTNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LFR_GLCATEGORYPRINTNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="LFR_GLCATEGORYPRINTNAME"/>
 	</field>
 	<field name="FOOTERCENTER" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="FOOTERCENTER"/>
@@ -78,47 +80,36 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 		<property name="com.jaspersoft.studio.field.name" value="LFR_NUMECRITURE"/>
 		<property name="com.jaspersoft.studio.field.label" value="LFR_NUMECRITURE"/>
 	</field>
-	<variable name="JournalTotalDebit" class="java.math.BigDecimal" resetType="Group" resetGroup="Journal" calculation="Sum">
+	<variable name="SumMvtsDebit" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{AMTACCTDR}]]></variableExpression>
 	</variable>
-	<variable name="JournalTotalCredit" class="java.math.BigDecimal" resetType="Group" resetGroup="Journal" calculation="Sum">
+	<variable name="SumMvtsCredit" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{AMTACCTCR}]]></variableExpression>
 	</variable>
-	<group name="Journal" isStartNewColumn="true" isStartNewPage="true" minHeightToStartNewPage="10">
-		<groupExpression><![CDATA[$F{GL_CATEGORY_ID}]]></groupExpression>
+	<variable name="SoldeProgressif" class="java.math.BigDecimal" resetType="Group" resetGroup="Compte" calculation="Sum">
+		<variableExpression><![CDATA[new java.math.BigDecimal($F{LFR_SOLDEPROGRESSIF}.doubleValue())]]></variableExpression>
+	</variable>
+	<group name="Compte" isReprintHeaderOnEachPage="true" minHeightToStartNewPage="10">
+		<groupExpression><![CDATA[$F{C_ELEMENTVALUE_ID}]]></groupExpression>
 		<groupHeader>
-			<band height="19" splitType="Stretch"/>
-		</groupHeader>
-		<groupFooter>
-			<band height="38" splitType="Stretch">
-				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
-					<reportElement key="textField-40" x="399" y="8" width="68" height="11" uuid="00906d1b-faf6-417a-8916-53a2336e5b24"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="DejaVu Sans" size="8" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$V{JournalTotalDebit}]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
-					<reportElement key="textField-41" x="467" y="8" width="68" height="11" uuid="e6b94783-e650-44c6-a6ae-a122f5a33ce6"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="DejaVu Sans" size="8" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$V{JournalTotalCredit}]]></textFieldExpression>
-				</textField>
-				<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-					<reportElement key="textField-58" x="338" y="8" width="60" height="10" uuid="89250707-da71-4f9b-b24f-c6e9c373c8d3"/>
+			<band height="18" splitType="Stretch">
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField-1" x="0" y="1" width="511" height="14" uuid="53d64559-0181-451c-9467-9bee56b02062"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<bottomPen lineWidth="0.0" lineColor="#000000"/>
 						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					</box>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="DejaVu Sans" size="8" isBold="true"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="DejaVu Sans"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$R{localization.total}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{HEADERCENTER}]]></textFieldExpression>
 				</textField>
 			</band>
+		</groupHeader>
+		<groupFooter>
+			<band splitType="Stretch"/>
 		</groupFooter>
 	</group>
 	<background>
@@ -128,9 +119,9 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 		<band splitType="Stretch"/>
 	</title>
 	<pageHeader>
-		<band height="61" splitType="Stretch">
+		<band height="79" splitType="Stretch">
 			<textField isBlankWhenNull="false">
-				<reportElement key="textField-36" x="2" y="1" width="267" height="17" uuid="b98eb791-1333-4e4d-baf1-018a0e5dce16"/>
+				<reportElement key="textField-36" x="2" y="1" width="248" height="17" uuid="a2644f8e-d85e-4df4-b83f-96db3018f667"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -138,12 +129,12 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left">
-					<font fontName="DejaVu Sans" size="10" isBold="true" isItalic="true"/>
+					<font fontName="DejaVu Sans" size="10" isBold="true" isItalic="true" pdfFontName="Helvetica-BoldOblique"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{CLIENTNAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement key="textField-37" x="281" y="1" width="254" height="17" uuid="ed2565dd-90cd-4ae8-b733-e75285186605"/>
+				<reportElement key="textField-37" x="260" y="1" width="275" height="17" uuid="0c3dbc72-4e7a-476b-af64-14c331fe0bc9"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -151,19 +142,19 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Right">
-					<font fontName="DejaVu Sans" size="10" isBold="true" isItalic="true"/>
+					<font fontName="DejaVu Sans" size="10" isBold="true" isItalic="true" pdfFontName="Helvetica-BoldOblique"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{ORGNAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
-				<reportElement key="textField-57" mode="Opaque" x="0" y="19" width="535" height="25" backcolor="#CCCCCC" uuid="f3ef71eb-b9ec-466f-b53c-dd8ab9f64434"/>
+				<reportElement key="textField-57" mode="Opaque" x="0" y="19" width="535" height="25" backcolor="#CCCCCC" uuid="68a0034c-8303-4879-8e31-7ff21063e9f9"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="10" isBold="true"/>
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement key="textField-58" x="1" y="44" width="387" height="17" uuid="fc22b103-0fcc-4420-a131-89efe36b5238"/>
+				<reportElement key="textField-58" x="11" y="54" width="186" height="17" uuid="0d564ac9-f7f5-4301-8887-4b5bf5e00ad8"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -179,8 +170,8 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 	</pageHeader>
 	<columnHeader>
 		<band height="15" splitType="Stretch">
-			<staticText>
-				<reportElement key="textField-58" x="467" y="0" width="68" height="15" uuid="211084ef-efc9-4e62-be1f-a984415b392b"/>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-58" x="469" y="0" width="66" height="15" uuid="89250707-da71-4f9b-b24f-c6e9c373c8d3"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -190,10 +181,10 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Crédit]]></text>
-			</staticText>
-			<staticText>
-				<reportElement key="textField-58" x="79" y="0" width="50" height="15" uuid="04b6cfe6-4322-4548-b2ca-2826827a8a21"/>
+				<textFieldExpression><![CDATA[$R{localization.solde}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-58" x="402" y="0" width="68" height="15" uuid="89250707-da71-4f9b-b24f-c6e9c373c8d3"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -203,10 +194,10 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Date]]></text>
-			</staticText>
-			<staticText>
-				<reportElement key="textField-58" x="400" y="0" width="68" height="15" uuid="99a96d82-29cf-4b95-aefc-60518c932706"/>
+				<textFieldExpression><![CDATA[$R{localization.credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-58" x="59" y="0" width="50" height="15" uuid="89250707-da71-4f9b-b24f-c6e9c373c8d3"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -216,10 +207,10 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Débit]]></text>
-			</staticText>
-			<staticText>
-				<reportElement key="textField-58" x="20" y="0" width="60" height="15" uuid="7212fa62-9d35-4d1d-b4db-949382a3491b"/>
+				<textFieldExpression><![CDATA[$R{localization.date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-58" x="335" y="0" width="68" height="15" uuid="89250707-da71-4f9b-b24f-c6e9c373c8d3"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -229,10 +220,10 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Bureau]]></text>
-			</staticText>
-			<staticText>
-				<reportElement key="textField-58" x="128" y="0" width="50" height="15" uuid="b17644bc-d110-44a5-9bcb-98558897fa61"/>
+				<textFieldExpression><![CDATA[$R{localization.debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-58" x="0" y="0" width="60" height="15" uuid="89250707-da71-4f9b-b24f-c6e9c373c8d3"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -242,10 +233,10 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Compte]]></text>
-			</staticText>
-			<staticText>
-				<reportElement key="textField-58" x="177" y="0" width="160" height="15" uuid="d499d84f-7821-4b42-82da-e4d0c1fd9204"/>
+				<textFieldExpression><![CDATA[$R{localization.org}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-58" x="108" y="0" width="73" height="15" uuid="89250707-da71-4f9b-b24f-c6e9c373c8d3"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -255,10 +246,10 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Libellé]]></text>
-			</staticText>
-			<staticText>
-				<reportElement key="textField-58" x="336" y="0" width="65" height="15" uuid="cc7bd00f-3450-46dd-b76c-8a0e4e7b3cfe"/>
+				<textFieldExpression><![CDATA[$R{localization.glcat}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-58" x="180" y="0" width="156" height="15" uuid="89250707-da71-4f9b-b24f-c6e9c373c8d3"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -268,84 +259,64 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Tiers]]></text>
-			</staticText>
-			<textField pattern="" isBlankWhenNull="true">
-				<reportElement key="textField-58" x="0" y="0" width="20" height="15" uuid="6068c111-1d7e-44e6-8239-393b9980f2cd"/>
-				<box>
-					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="0.5" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["N°"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$R{localization.libelle}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="12" splitType="Stretch">
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
-				<reportElement key="textField" x="400" y="0" width="68" height="11" uuid="7b64df43-9bb9-4c41-a945-a21c4615d8b4">
+				<reportElement key="textField" x="335" y="1" width="68" height="11" uuid="3993f60d-dbbb-4522-83c2-510407b0fb46">
 					<printWhenExpression><![CDATA[(new Boolean( $F{AMTACCTDR}.doubleValue() >0 ))]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="7"/>
+					<font fontName="DejaVu Sans" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{AMTACCTDR}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
-				<reportElement key="textField" x="467" y="0" width="68" height="11" uuid="9ba4a870-a770-4e30-9b8f-efe73603cde1">
+				<reportElement key="textField" x="402" y="1" width="68" height="11" uuid="69f8a9e0-30fa-4cc2-80cf-37bb29ae6c46">
 					<printWhenExpression><![CDATA[(new Boolean( $F{AMTACCTCR}.doubleValue() >0 ))]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="7"/>
+					<font fontName="DejaVu Sans" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{AMTACCTCR}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement key="textField" x="177" y="0" width="160" height="11" uuid="f86378e7-2211-4911-9729-ebf0133a4ea6"/>
+				<reportElement key="textField" x="180" y="1" width="156" height="11" uuid="29013609-4245-441a-8950-44fed961496f"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="7"/>
+					<font fontName="DejaVu Sans" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{LFR_FACTACCTDESCRIPTION}]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd/MM/yy" isBlankWhenNull="true">
-				<reportElement key="textField" x="79" y="0" width="50" height="11" uuid="10fdc6a4-2a67-411e-91c3-b42b572af227"/>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField" x="59" y="1" width="50" height="11" uuid="188dd1bb-46c6-42ac-a44d-6d077dba9b59"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="7"/>
+					<font fontName="DejaVu Sans" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{DATEACCT}]]></textFieldExpression>
 			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField" x="469" y="1" width="66" height="11" uuid="7d6f131f-c02b-4d0f-bf01-e8ee191f28ef"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SoldeProgressif}]]></textFieldExpression>
+			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement key="textField" x="20" y="0" width="60" height="11" uuid="d047d310-d4f4-49b2-83f8-a42376ef2cd9"/>
+				<reportElement key="textField" x="0" y="1" width="60" height="11" uuid="12010055-bcc3-44a9-b595-2f3db54212ef"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="7"/>
+					<font fontName="DejaVu Sans" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{LFR_FACTACCTORG}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement key="textField-58" x="128" y="0" width="50" height="11" uuid="91bcaeed-2398-4780-9e6b-5ec315a6ec17"/>
+				<reportElement key="textField-62" x="108" y="1" width="73" height="11" uuid="c0e0e8bd-d772-45d4-85c7-4c7ffe870fb7"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="7"/>
+					<font fontName="DejaVu Sans" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{ACCOUNTVALUE}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement key="textField-59" x="336" y="0" width="65" height="11" uuid="b7c61d43-db6f-4bb4-80a1-736af0ed26ba"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="7"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{BPNAME}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement key="textField" x="0" y="0" width="20" height="11" uuid="745ccf8c-2e7d-4df8-8f8b-b40048a69e06"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="7"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{LFR_NUMECRITURE}.signum() != 0 ? $F{LFR_NUMECRITURE} : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{LFR_NUMECRITURE} == null || $F{LFR_NUMECRITURE}.intValue() == 0) ? $F{LFR_GLCATEGORYPRINTNAME} : $F{LFR_GLCATEGORYPRINTNAME} + " " + $F{LFR_NUMECRITURE}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -355,10 +326,10 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 	<pageFooter>
 		<band height="22" splitType="Stretch">
 			<line>
-				<reportElement key="line-1" x="2" y="1" width="533" height="1" uuid="5617d5d2-a655-4a51-82aa-663e5333fe81"/>
+				<reportElement key="line-1" x="2" y="1" width="533" height="1" uuid="0399e6ee-1f44-4e13-93bc-ede55a48eced"/>
 			</line>
-			<textField evaluationTime="Report" pattern="dd/MM/yyyy - HH&apos;h&apos;mm" isBlankWhenNull="true">
-				<reportElement key="textField-33" x="0" y="2" width="100" height="11" uuid="ac9aece0-996b-4ea9-9849-5ce6fb2e16b4"/>
+			<textField evaluationTime="Report" pattern="dd/MM/yyyy &apos;à&apos; HH&apos;h&apos;mm" isBlankWhenNull="true">
+				<reportElement key="textField-33" x="0" y="2" width="100" height="11" uuid="b7a97348-900f-4b15-a268-5816a2827575"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -366,12 +337,12 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="DejaVu Sans" size="8"/>
+					<font fontName="DejaVu Sans" size="8" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
-				<reportElement key="textField-34" x="477" y="2" width="34" height="11" uuid="68ba15e8-eb7b-4783-b25e-e969de223813"/>
+				<reportElement key="textField-34" x="455" y="2" width="56" height="11" uuid="5d971162-5fcc-4f34-9a5c-0aefdb7256fd"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -384,7 +355,7 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 				<textFieldExpression><![CDATA["Page " + String.valueOf($V{PAGE_NUMBER}) + "/ "]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report" isBlankWhenNull="false">
-				<reportElement key="textField-35" x="511" y="2" width="24" height="11" uuid="cae73d59-934c-4273-a805-d1af7925b5ba"/>
+				<reportElement key="textField-35" x="511" y="2" width="24" height="11" uuid="5eb0672d-19e7-4720-8756-e08e1c11cea4"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -397,7 +368,7 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 				<textFieldExpression><![CDATA[String.valueOf($V{PAGE_NUMBER})]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement key="textField-34" x="124" y="11" width="287" height="11" uuid="4027f5a8-e2f9-4c23-81cf-aeaffedceac9"/>
+				<reportElement key="textField-34" x="124" y="11" width="287" height="11" uuid="0cfbad24-1d6b-47cb-a24d-7ef3515cd66e"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -412,17 +383,34 @@ ORDER BY PrintName, T_LFR_Report_ID]]>
 		</band>
 	</pageFooter>
 	<summary>
-		<band splitType="Stretch"/>
-	</summary>
-	<noData>
-		<band height="30" splitType="Stretch">
-			<staticText>
-				<reportElement key="staticText-33" x="4" y="0" width="527" height="30" uuid="6896272b-79a8-4ca9-8357-a1064af40ac1"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="18"/>
+		<band height="50" splitType="Stretch">
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField-58" x="323" y="7" width="79" height="19" uuid="55d22e39-0946-4d4a-bc9d-098875a62eef"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="DejaVu Sans" size="8"/>
 				</textElement>
-				<text><![CDATA[Impossible de générer le journal avec ces critères]]></text>
-			</staticText>
+				<textFieldExpression><![CDATA[$V{SumMvtsDebit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField-59" x="402" y="7" width="78" height="19" uuid="051b39bb-ab67-4dde-99fc-a120098eec3f"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SumMvtsCredit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-58" x="161" y="7" width="149" height="19" uuid="89250707-da71-4f9b-b24f-c6e9c373c8d3"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$R{localization.total.periode}]]></textFieldExpression>
+			</textField>
 		</band>
-	</noData>
+	</summary>
 </jasperReport>

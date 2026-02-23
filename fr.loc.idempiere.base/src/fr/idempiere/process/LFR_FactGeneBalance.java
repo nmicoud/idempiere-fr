@@ -29,11 +29,8 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
-import org.compiere.model.MClient;
 import org.compiere.model.MElementValue;
-import org.compiere.model.MOrg;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.util.DB;
 import org.compiere.util.Util;
@@ -45,11 +42,8 @@ import fr.idempiere.model.MTLFRReport;
  *  @author Nicolas Micoud - TGI
  */
 
-public class LFR_FactGeneBalance extends LfrProcess {
+public class LFR_FactGeneBalance extends LfrProcessFact {
 
-	private int			p_acctSchema_ID = 0;
-	private int			p_orgID = 0;
-	private String		p_postingType = "";
 	private int 		p_accountFromID = 0;
 	private int 		p_accountToID = 0;
 	private Timestamp	p_dateAcctFrom = null;
@@ -64,16 +58,11 @@ public class LFR_FactGeneBalance extends LfrProcess {
 	 */
 	protected void prepare()
 	{
+		super.prepare();
 		ProcessInfoParameter[] para = getParameter();
 		for (int i = 0; i < para.length; i++) {
 			String name = para[i].getParameterName();
-			if (name.equals("C_AcctSchema_ID"))
-				p_acctSchema_ID = para[i].getParameterAsInt();
-			else if (name.equals("AD_Org_ID"))
-				p_orgID = para[i].getParameterAsInt();
-			else if (name.equals("PostingType"))
-				p_postingType = para[i].getParameterAsString();
-			else if (name.equals("DateAcct")) {
+			if (name.equals("LFR_ProcessParaDateAcct")) {
 				p_dateAcctFrom = para[i].getParameterAsTimestamp();
 				p_dateAcctTo = para[i].getParameter_ToAsTimestamp();
 			}
@@ -89,8 +78,6 @@ public class LFR_FactGeneBalance extends LfrProcess {
 				p_isSummary = para[i].getParameterAsBoolean();
 			else if (name.equals("LFR_BalanceGeneRegrLevel"))
 				p_balanceGeneRegrLevel = para[i].getParameterAsString();
-			else
-				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
 	}	//	prepare
 
@@ -101,19 +88,10 @@ public class LFR_FactGeneBalance extends LfrProcess {
 	 */
 	protected String doIt () throws Exception
 	{
-		String orgName = "";
-		String reportTitle = "Balance Générale";
-		String footerCenter = "";
 		int lines = 0;
 
 		// on ajoute un tiret pour séparer les plages de date ; ce tiret est utilisé dans l'état Jasper
-		String criteresDate = MTLFRReport.getDateCriteres(getCtx(), getAD_Client_ID(), p_dateAcctPrecFrom, p_dateAcctPrecTo) + "-" + MTLFRReport.getDateCriteres(getCtx(), getAD_Client_ID(), p_dateAcctFrom, p_dateAcctTo);
-
-		StringBuilder sqlOrg = new StringBuilder("");
-		if (p_orgID > 0) {
-			orgName = MOrg.get(getCtx(), p_orgID).getName();	
-			sqlOrg = new StringBuilder(" AND fa.AD_Org_ID = ?");
-		}
+		String criteresDate = getDateCriteres(getAD_Client_ID(), p_dateAcctPrecFrom, p_dateAcctPrecTo) + "-" + getDateCriteres(getAD_Client_ID(), p_dateAcctFrom, p_dateAcctTo);
 
 		// Sélection des comptes concernés par l'édition
 		ArrayList<Object> params = new ArrayList<Object>();
@@ -130,10 +108,9 @@ public class LFR_FactGeneBalance extends LfrProcess {
 		params.add(p_dateAcctPrecFrom);
 		params.add(p_dateAcctTo);
 
-		if (p_orgID > 0) {
-			sql1.append(sqlOrg);
-			params2.add(p_orgID);
-		}
+		sql1.append(getSqlWhereOrg("fa"));
+		sql1.append(getSqlWhereGLCatToExclude("fa"));
+		setFooterCenter(getGLCatToExclude());
 
 		if (p_accountFromID > 0) {
 			sql1.append(" AND fa.AccountValue >= (SELECT Value FROM C_ElementValue WHERE C_ElementValue_ID = ?)");
@@ -157,10 +134,10 @@ public class LFR_FactGeneBalance extends LfrProcess {
 			MTLFRReport taf = new MTLFRReport(getCtx(), 0, getAD_PInstance_ID(), get_TrxName());
 			taf.setLine(lines++);
 			taf.setC_ElementValue_ID(accountID);
-			if (p_orgID > 0)
-				taf.setAD_Org_ID(p_orgID);
-			taf.setClientName(MClient.get(getCtx(), getAD_Client_ID()).getName());
-			taf.setOrgName(orgName);
+			taf.setClientName(getClientName());
+			taf.setC_AcctSchema_ID(p_acctSchema_ID);
+			taf.setPostingType(p_postingType);
+			taf.setOrgName(getOrgName());
 			taf.setAccountValue(accountValue);
 			taf.setAccount_Name(ev.getName());
 			taf.setLFR_CL1(accountValue.substring(0,1));
@@ -183,10 +160,7 @@ public class LFR_FactGeneBalance extends LfrProcess {
 			params.add(p_postingType);
 			params.add(accountID);
 
-			if (p_orgID > 0) {
-				sql2.append(sqlOrg);
-				params.add(p_orgID);
-			}
+			sql2.append(getSqlWhereOrg("fa"));
 
 			sql2.append(" AND fa.DateAcct >= ?")
 			.append(" AND fa.DateAcct <= ?")
@@ -219,8 +193,8 @@ public class LFR_FactGeneBalance extends LfrProcess {
 				}
 			}
 
-			taf.setFooterCenter(footerCenter);
-			taf.setTitle(reportTitle);
+			taf.setFooterCenter(getFooterCenter());
+			taf.setTitle(getReportTitle());
 			taf.setLFR_DateAsString(criteresDate);
 			taf.saveEx();
 		}
@@ -235,4 +209,7 @@ public class LFR_FactGeneBalance extends LfrProcess {
 		return retValue.toArray();
 	}
 
+	protected String getTitleCenter() {
+		return "Balance Générale";
+	}
 }	//	LFR_FactGeneBalance

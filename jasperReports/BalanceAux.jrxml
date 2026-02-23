@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.17.0-6d93193241dd8cc42629e188b94f9e0bc5722efd  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BalanceAux" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="551" leftMargin="22" rightMargin="22" topMargin="20" bottomMargin="20" resourceBundle="localization" uuid="6bebd55c-ae85-4de5-a4a9-cf0e6048eb6b">
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="ireport.zoom" value="1.8150000000000028"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Explight WIP"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="250"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="744"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<style name="StyleLignePaireImpaire" backcolor="#FFFFFF" fontName="Calibri" isBold="true">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean( $V{PAGE_COUNT}.intValue() % 2 ==0 )]]></conditionExpression>
+			<style forecolor="#000001" backcolor="#999999" isBlankWhenNull="false" fontName="Calibri" isBold="false"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="AD_PINSTANCE_ID" class="java.lang.Integer"/>
+	<parameter name="date_fin" class="java.util.Date" isForPrompting="false"/>
+	<parameter name="date_deb" class="java.util.Date" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[SELECT LFR_AmtDebutDr, LFR_AmtDebutCr, AmtAcctDr, AmtAcctCr, AmtAcct, LFR_AmtFinalDr, LFR_AmtFinalCr, C_BPartner_ID, LFR_BPartnerDisplayName, ClientName, OrgName, Title, LFR_DateAsString
+FROM T_LFR_Report
+WHERE AD_PInstance_ID = $P{AD_PINSTANCE_ID} ORDER BY Line]]>
+	</queryString>
+	<field name="LFR_AMTDEBUTDR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="LFR_AMTDEBUTDR"/>
+		<property name="com.jaspersoft.studio.field.label" value="LFR_AMTDEBUTDR"/>
+	</field>
+	<field name="LFR_AMTDEBUTCR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="LFR_AMTDEBUTCR"/>
+		<property name="com.jaspersoft.studio.field.label" value="LFR_AMTDEBUTCR"/>
+	</field>
+	<field name="AMTACCTDR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AMTACCTDR"/>
+		<property name="com.jaspersoft.studio.field.label" value="AMTACCTDR"/>
+	</field>
+	<field name="AMTACCTCR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AMTACCTCR"/>
+		<property name="com.jaspersoft.studio.field.label" value="AMTACCTCR"/>
+	</field>
+	<field name="AMTACCT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AMTACCT"/>
+		<property name="com.jaspersoft.studio.field.label" value="AMTACCT"/>
+	</field>
+	<field name="LFR_AMTFINALDR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="LFR_AMTFINALDR"/>
+		<property name="com.jaspersoft.studio.field.label" value="LFR_AMTFINALDR"/>
+	</field>
+	<field name="LFR_AMTFINALCR" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="LFR_AMTFINALCR"/>
+		<property name="com.jaspersoft.studio.field.label" value="LFR_AMTFINALCR"/>
+	</field>
+	<field name="C_BPARTNER_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="C_BPARTNER_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="C_BPARTNER_ID"/>
+	</field>
+	<field name="LFR_BPARTNERDISPLAYNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PRINTNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="PRINTNAME"/>
+	</field>
+	<field name="CLIENTNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CLIENTNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="CLIENTNAME"/>
+	</field>
+	<field name="ORGNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ORGNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ORGNAME"/>
+	</field>
+	<field name="TITLE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TITLE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TITLE"/>
+	</field>
+	<field name="LFR_DATEASSTRING" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LFR_DATEASSTRING"/>
+		<property name="com.jaspersoft.studio.field.label" value="LFR_DATEASSTRING"/>
+	</field>
+	<variable name="debut_total_debit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{LFR_AMTDEBUTDR}]]></variableExpression>
+	</variable>
+	<variable name="debut_total_credit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{LFR_AMTDEBUTCR}]]></variableExpression>
+	</variable>
+	<variable name="mvts_total_debit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMTACCTDR}]]></variableExpression>
+	</variable>
+	<variable name="mvts_total_credit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMTACCTCR}]]></variableExpression>
+	</variable>
+	<variable name="mvts_total_solde" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMTACCT}]]></variableExpression>
+	</variable>
+	<variable name="final_total_debit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{LFR_AMTFINALDR}]]></variableExpression>
+	</variable>
+	<variable name="final_total_credit" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{LFR_AMTFINALCR}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<group name="Tiers">
+		<groupExpression><![CDATA[$F{C_BPARTNER_ID}]]></groupExpression>
+		<groupHeader>
+			<band splitType="Stretch"/>
+		</groupHeader>
+		<groupFooter>
+			<band height="10" splitType="Stretch">
+				<textField pattern="#,##0.00" isBlankWhenNull="false">
+					<reportElement key="textField" style="StyleLignePaireImpaire" x="260" y="0" width="55" height="10" uuid="9c40450f-caa6-4eae-9c0f-b8912814d643">
+						<printWhenExpression><![CDATA[(new Boolean($F{AMTACCTDR}.doubleValue() !=0 ))]]></printWhenExpression>
+					</reportElement>
+					<box leftPadding="3" rightPadding="2">
+						<pen lineWidth="0.0" lineColor="#999999"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="SansSerif" size="7" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{AMTACCTDR}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement key="textField" style="StyleLignePaireImpaire" x="370" y="0" width="55" height="10" uuid="5f83e4cb-e603-4b46-b6bc-e22410862b3a">
+						<printWhenExpression><![CDATA[(new Boolean($F{AMTACCT}.doubleValue() !=0 ))]]></printWhenExpression>
+					</reportElement>
+					<box leftPadding="3" rightPadding="2">
+						<pen lineWidth="0.0" lineColor="#999999"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="SansSerif" size="7" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{AMTACCT}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField-1" style="StyleLignePaireImpaire" x="0" y="0" width="150" height="10" uuid="844e7550-bcbe-4df9-8427-b464d9573821"/>
+					<box leftPadding="3" rightPadding="2">
+						<pen lineWidth="0.0" lineColor="#999999"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="SansSerif" size="7" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LFR_BPARTNERDISPLAYNAME}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00" isBlankWhenNull="false">
+					<reportElement key="textField" style="StyleLignePaireImpaire" x="315" y="0" width="55" height="10" uuid="46672c89-586c-4c04-b713-4511ed900864">
+						<printWhenExpression><![CDATA[(new Boolean($F{AMTACCTCR}.doubleValue() !=0 ))]]></printWhenExpression>
+					</reportElement>
+					<box leftPadding="3" rightPadding="2">
+						<pen lineWidth="0.0" lineColor="#999999"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="SansSerif" size="7" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{AMTACCTCR}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement key="line-3" x="150" y="0" width="1" height="10" uuid="dc4ef257-dd49-492a-be0c-c012b16f0856"/>
+				</line>
+				<textField pattern="#,##0.00" isBlankWhenNull="false">
+					<reportElement key="textField-19" style="StyleLignePaireImpaire" x="150" y="0" width="55" height="10" uuid="ffde890b-34d2-4c82-85b0-363da9751c7b">
+						<printWhenExpression><![CDATA[(new Boolean($F{LFR_AMTDEBUTDR}.doubleValue() !=0 ))]]></printWhenExpression>
+					</reportElement>
+					<box leftPadding="3" rightPadding="2">
+						<pen lineWidth="0.0" lineColor="#999999"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="SansSerif" size="7" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LFR_AMTDEBUTDR}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00" isBlankWhenNull="false">
+					<reportElement key="textField-20" style="StyleLignePaireImpaire" x="205" y="0" width="55" height="10" uuid="103026d7-e081-474c-94e9-7f83033dddf2">
+						<printWhenExpression><![CDATA[(new Boolean($F{LFR_AMTDEBUTCR}.doubleValue() !=0 ))]]></printWhenExpression>
+					</reportElement>
+					<box leftPadding="3" rightPadding="2">
+						<pen lineWidth="0.0" lineColor="#999999"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="SansSerif" size="7" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LFR_AMTDEBUTCR}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement key="textField-21" style="StyleLignePaireImpaire" x="425" y="0" width="55" height="10" uuid="f5db9020-3119-4f77-9a02-703530601daf">
+						<printWhenExpression><![CDATA[(new Boolean($F{LFR_AMTFINALDR}.doubleValue() !=0 ))]]></printWhenExpression>
+					</reportElement>
+					<box leftPadding="3" rightPadding="2">
+						<pen lineWidth="0.0" lineColor="#999999"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="SansSerif" size="7" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LFR_AMTFINALDR}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement key="textField-22" style="StyleLignePaireImpaire" x="480" y="0" width="55" height="10" uuid="647acb58-8527-42dc-b88b-931795f6d48e">
+						<printWhenExpression><![CDATA[(new Boolean($F{LFR_AMTFINALCR}.doubleValue() !=0 ))]]></printWhenExpression>
+					</reportElement>
+					<box leftPadding="3" rightPadding="2">
+						<pen lineWidth="0.0" lineColor="#999999"/>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#999999"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="SansSerif" size="7" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{LFR_AMTFINALCR}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement key="line-27" x="0" y="-1" width="1" height="11" uuid="fd55bcb9-018e-4572-82ce-da55fc42ea35"/>
+				</line>
+				<line>
+					<reportElement key="line-32" x="535" y="0" width="1" height="10" uuid="605871a1-ec76-4770-b3ca-e3e057659f8e"/>
+				</line>
+				<line>
+					<reportElement key="line-34" x="425" y="0" width="1" height="10" uuid="0e8ac0bb-2708-458d-9feb-d9122eec5ed8"/>
+				</line>
+				<line>
+					<reportElement key="line-35" x="260" y="0" width="1" height="10" uuid="05194797-cb3a-4f43-b540-4be4998f1091"/>
+				</line>
+				<line>
+					<reportElement key="line-39" x="150" y="0" width="1" height="10" uuid="92a35869-292b-41b0-9097-cf1b59622cc2"/>
+				</line>
+				<line>
+					<reportElement key="line-40" positionType="FixRelativeToBottom" mode="Transparent" x="0" y="9" width="536" height="1" forecolor="#CCCCCC" uuid="677023b5-7185-410a-b8d4-fdc21dec0723"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="67" splitType="Stretch">
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-32" x="14" y="2" width="247" height="17" uuid="56241dca-5717-4dcc-b1cf-e3ffe759fcad"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" pdfFontName="Helvetica-BoldOblique"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CLIENTNAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField-33" x="286" y="2" width="261" height="17" uuid="5f80083f-f7ca-4b70-acbe-06f449f7aadf"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" pdfFontName="Helvetica-BoldOblique"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORGNAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-48" mode="Opaque" x="8" y="19" width="535" height="25" backcolor="#CCCCCC" uuid="c032f45f-72e2-4db9-87d8-e25d60791ed3"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TITLE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="370" y="50" width="165" height="11" uuid="50f97272-46fa-4376-af71-c47b8dd47e31"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LFR_DATEASSTRING}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<line>
+				<reportElement key="line-1" x="150" y="1" width="1" height="20" uuid="d7d8b5b6-5f35-49a8-aefe-f10b9da1a383"/>
+			</line>
+			<line>
+				<reportElement key="line-23" x="150" y="1" width="385" height="1" uuid="00e86c4b-62a6-4260-9d11-808f4bbf4a60"/>
+			</line>
+			<line>
+				<reportElement key="line-25" x="150" y="11" width="385" height="1" uuid="e589e19b-7d47-4f78-a7f6-56b48aba8d73"/>
+			</line>
+			<line>
+				<reportElement key="line-26" x="0" y="19" width="536" height="1" uuid="128fac7a-b13e-4ade-8a9a-f79f955b38e4"/>
+			</line>
+			<line>
+				<reportElement key="line-29" x="260" y="1" width="1" height="20" uuid="fc67e58c-771f-4d4d-baf5-8c15cf3701f8"/>
+			</line>
+			<line>
+				<reportElement key="line-30" x="425" y="1" width="1" height="20" uuid="3e470d74-7304-4043-87e9-1e16a09cb623"/>
+			</line>
+			<line>
+				<reportElement key="line-31" x="535" y="1" width="1" height="20" uuid="5ec24a24-43e4-45cb-a6f3-6d9e436924ae"/>
+			</line>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="150" y="11" width="55" height="9" uuid="50f97272-46fa-4376-af71-c47b8dd47e31"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$R{localization.debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="205" y="11" width="55" height="9" uuid="50f97272-46fa-4376-af71-c47b8dd47e31"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$R{localization.credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="150" y="0" width="110" height="11" uuid="50f97272-46fa-4376-af71-c47b8dd47e31"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$R{localization.debut.periode}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="315" y="11" width="55" height="9" uuid="50f97272-46fa-4376-af71-c47b8dd47e31"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$R{localization.credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="260" y="11" width="55" height="9" uuid="50f97272-46fa-4376-af71-c47b8dd47e31"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$R{localization.debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="260" y="0" width="164" height="11" uuid="50f97272-46fa-4376-af71-c47b8dd47e31"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$R{localization.mvts.periode}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="370" y="11" width="55" height="9" uuid="50f97272-46fa-4376-af71-c47b8dd47e31"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$R{localization.solde}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="480" y="11" width="55" height="9" uuid="50f97272-46fa-4376-af71-c47b8dd47e31"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$R{localization.credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="425" y="11" width="55" height="9" uuid="50f97272-46fa-4376-af71-c47b8dd47e31"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$R{localization.debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="426" y="0" width="109" height="11" uuid="50f97272-46fa-4376-af71-c47b8dd47e31"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$R{localization.solde.au} + " " + $F{LFR_DATEASSTRING}.substring( $F{LFR_DATEASSTRING}.length()-10, $F{LFR_DATEASSTRING}.length())]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="23" splitType="Stretch">
+			<textField evaluationTime="Report" pattern="dd/MM/yyyy &apos;à&apos; HH&apos;h&apos;mm" isBlankWhenNull="true">
+				<reportElement key="textField-36" x="1" y="6" width="100" height="11" uuid="da5ad1ee-7bf2-423e-a783-e4516ff94426"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="8" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" isBlankWhenNull="false">
+				<reportElement key="textField-46" x="521" y="6" width="15" height="11" uuid="b89415c4-0eed-4df0-8ba6-b53ad8438f97"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.valueOf($V{PAGE_NUMBER})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-47" x="471" y="6" width="50" height="11" uuid="e72f1e4e-4371-45eb-b0f4-050ae12cf354"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page " + String.valueOf($V{PAGE_NUMBER}) + "/"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="10" splitType="Stretch">
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="205" y="0" width="55" height="9" uuid="8cd8bdb2-8300-459d-a5cd-11871ec042b1"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{debut_total_credit} == null ? new BigDecimal(0.0) : $V{debut_total_credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField-40" x="150" y="0" width="55" height="9" uuid="3b8c2280-9b0a-44a4-b049-3aa787d6c3b2"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{debut_total_debit} == null ? new BigDecimal(0.0) : $V{debut_total_debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField-41" x="260" y="0" width="55" height="9" uuid="bcc34bb9-d4d5-4ea2-a4fe-f5ae0910d59f"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{mvts_total_debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField-42" x="315" y="0" width="55" height="9" uuid="c8223f11-297b-4818-a7f1-617ca90690f6"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{mvts_total_credit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField-43" x="370" y="0" width="55" height="9" uuid="13ca3eea-3dae-4357-bfd5-bddc8608d139"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{mvts_total_solde}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField-44" x="425" y="0" width="55" height="9" uuid="57fef9fc-d0ac-466e-9660-566eff00ba2f"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{final_total_debit} == null ? new BigDecimal(0.0) : $V{final_total_debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField-45" x="480" y="0" width="55" height="9" uuid="bd0e1f81-b2fb-4657-8975-4b4c525f0e79"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{final_total_credit} == null ? new BigDecimal(0.0) : $V{final_total_credit}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement key="line-22" positionType="Float" x="0" y="0" width="536" height="1" uuid="e3d945e3-d9f9-4e6e-ae89-f6651b0a6320"/>
+			</line>
+			<line>
+				<reportElement key="line-24" x="150" y="9" width="385" height="1" uuid="b2999ecf-01f8-4140-82c3-d0b70cd96b77"/>
+			</line>
+			<line>
+				<reportElement key="line-28" x="150" y="0" width="1" height="10" uuid="cc393228-7b77-4c15-860a-e97219ab8111"/>
+			</line>
+			<line>
+				<reportElement key="line-33" x="535" y="0" width="1" height="10" uuid="188fde08-9a56-4d31-ad37-3bccd8e1e9d8"/>
+			</line>
+			<line>
+				<reportElement key="line-36" x="260" y="0" width="1" height="10" uuid="80cefdc7-aa4e-468e-bc91-fd2d23b63a64"/>
+			</line>
+			<line>
+				<reportElement key="line-37" x="425" y="0" width="1" height="10" uuid="0b0501a2-0961-49fd-81f9-e77b1064e742"/>
+			</line>
+		</band>
+	</summary>
+	<noData>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement key="staticText-25" x="0" y="0" width="551" height="30" uuid="42a4d90a-7836-4d81-bc0d-4bb7000fc648"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="18"/>
+				</textElement>
+				<text><![CDATA[Impossible de générer la balance avec vos critères]]></text>
+			</staticText>
+		</band>
+	</noData>
+</jasperReport>

@@ -25,6 +25,7 @@ public class MLFRFactReconciliationCode extends X_LFR_FactReconciliationCode
 	private static CLogger s_log = CLogger.getCLogger(MLFRFactReconciliationCode.class);
 	
 	private final static String PREMIER_CODE = "A";
+	private final static String SECOND_CODE = "B";
 	private final static int INCREMENT = 1;
 	
 	/**************************************************************************
@@ -155,7 +156,7 @@ public class MLFRFactReconciliationCode extends X_LFR_FactReconciliationCode
 				frc.setC_AcctSchema_ID(acctSchemaID);
 				frc.setLFR_FactReconciliationType(type);
 				frc.setRecord_ID(recordID);
-				frc.setCode(PREMIER_CODE);
+				frc.setCode(SECOND_CODE);
 				frc.saveEx();
 				retValue = PREMIER_CODE;
 			}

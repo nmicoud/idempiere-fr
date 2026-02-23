@@ -1,21 +1,25 @@
 package fr.idempiere.util;
 
+import static fr.idempiere.model.SystemIDs_LFR.LFR_IMMEDIATE_RECONCILIATION;
+
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MFactAcct;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MPayment;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.MTable;
 import org.compiere.model.PO;
+import org.compiere.model.Query;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -26,14 +30,18 @@ public class LfrFactReconciliationUtil {
 	
 	private static CLogger s_log = CLogger.getCLogger(LfrFactReconciliationUtil.class);
 
+	public static boolean isUseImmediateReconciliation(int clientID) {
+		return MSysConfig.getBooleanValue(LFR_IMMEDIATE_RECONCILIATION, false, clientID);
+	}
+
 	public static void factReconcile(PO po) {
 		
 		if (po.get_Table_ID() == MInvoice.Table_ID && !po.get_ValueAsBoolean("IsPaid"))
 			return;
 		else if (po.get_Table_ID() == MPayment.Table_ID && !po.get_ValueAsBoolean("IsAllocated"))
 			return;
-
-		String sql = "SELECT fa.C_AcctSchema_ID, fa.Fact_Acct_ID"
+/*
+		String sql = "SELECT fa.C_AcctSchema_ID, fa.Fact_Acct_ID" // TODO ajouter ici les paramètres utilisés par @LettrageFactAcct
 				+ " FROM Fact_Acct fa, C_ElementValue ev"
 				+ " WHERE fa.PostingType='A' AND fa.AD_Client_ID=" + po.getAD_Client_ID()
 				+ " AND AD_Table_ID = " + po.get_Table_ID() + " AND Record_ID = " + po.get_ID()
@@ -59,35 +67,59 @@ public class LfrFactReconciliationUtil {
 			rs = null;
 			pstmt = null;
 		}
-	}
+*/		
+		StringBuilder whereClause = new StringBuilder("Fact_Acct.AD_Client_ID = ? AND Fact_Acct.PostingType = ? AND Fact_Acct.AD_Table_ID = ? AND Record_ID = ? AND ev.BPartnerType IS NOT NULL");
+		ArrayList<Object> params = new ArrayList<Object>();
+		params.add(po.getAD_Client_ID());
+		params.add(MFactAcct.POSTINGTYPE_Actual);
+		params.add(po.get_Table_ID());
+		params.add(po.get_ID());
 
-	public static int LettrageFactAcct (Properties ctx, int Fact_Acct_ID, int C_AcctSchema_ID, String trxName)
+		Query query = new Query(po.getCtx(), MFactAcct.Table_Name, whereClause.toString(), po.get_TrxName())
+				.addJoinClause("INNER JOIN C_ElementValue ev ON (Fact_Acct.Account_ID = ev.C_ElementValue_ID)")
+				.setParameters(params)
+				.setOrderBy("Fact_Acct.Account_ID, Fact_Acct.Fact_Acct_ID");
+
+		System.out.println(query.getSQL());
+		for (Object o : params)
+			System.out.println(o);
+
+		List<MFactAcct> listFA = query.list();
+
+		for (MFactAcct fa : listFA)
+			LfrFactReconciliationUtil.lettrageFactAcct(po.getCtx(), fa, false, po.get_TrxName());
+	}
+	
+	public static int lettrageFactAcct (Properties ctx, MFactAcct fa, boolean checkMatchCode, String trxName)
 	{
 		int nbLettrees = 0;
 		int retValue = 0;
-		String sql = "SELECT fa.Account_ID, fa.AD_Table_ID, fa.Record_ID, fa.Line_ID, fa.C_BPartner_ID" 
-				+ " FROM Fact_Acct fa"
-				+ " WHERE Fact_Acct_ID = " + Fact_Acct_ID;
+//		String sql = "SELECT fa.Account_ID, fa.AD_Table_ID, fa.Record_ID, fa.Line_ID, fa.C_BPartner_ID" 
+//				+ " FROM Fact_Acct fa"
+//				+ " WHERE Fact_Acct_ID = " + Fact_Acct_ID;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
 		try {
-			pstmt = DB.prepareStatement(sql, trxName);
-			rs = pstmt.executeQuery ();
+//			pstmt = DB.prepareStatement(sql, trxName);
+//			rs = pstmt.executeQuery ();
 			ArrayList<MAllocationHdr> allocs = new ArrayList<MAllocationHdr>();
 			ArrayList<Object> docs = new ArrayList<Object>();
 
-			while (rs.next()) {
-				int Account_ID = rs.getInt(1);
-				int AD_Table_ID = rs.getInt(2);
-				int Record_ID = rs.getInt(3);
-				int Line_ID = rs.getInt(4);
-				int C_BPartner_ID = rs.getInt(5);
+	//		while (rs.next()) {
+//				int Account_ID = rs.getInt(1);
+//				int AD_Table_ID = rs.getInt(2);
+//				int Record_ID = rs.getInt(3);
+//				int Line_ID = rs.getInt(4);
+//				int C_BPartner_ID = rs.getInt(5);
 
+			if (checkMatchCode) {
 				//Verification que l'écriture comptable n'a pas été léttrée précédemment TODO rendre optionnel car pas d'intérêt de le faire suite à la génération des écritures d'une facture
-				String matchcode = getMatchCodeOfFactAcct(C_AcctSchema_ID, AD_Table_ID, Record_ID, Line_ID, Account_ID, trxName);
+				String matchcode = getMatchCodeOfFactAcct(fa, trxName);
 				if (matchcode != null)
-					continue;
+					//continue;
+					return -1;
+			}
 
 				MInvoice inv = null;
 				MPayment pay = null;
@@ -97,29 +129,29 @@ public class LfrFactReconciliationUtil {
 				docs = new ArrayList<Object>();
 
 				//Récupération des affectations du document courant
-				if (AD_Table_ID == MInvoice.Table_ID) {
-					inv = new MInvoice(ctx, Record_ID, trxName);
+				if (fa.getAD_Table_ID() == MInvoice.Table_ID) {
+					inv = new MInvoice(ctx, fa.getRecord_ID(), trxName);
 					docs.add(inv);
-					allocs = getOfPosted(ctx, AD_Table_ID, Record_ID, trxName);
+					allocs = getOfPosted(ctx, fa.getAD_Table_ID(), fa.getRecord_ID(), trxName);
 				}
-				else if (AD_Table_ID == MPayment.Table_ID) {
-					pay = new MPayment(ctx, Record_ID, trxName);
+				else if (fa.getAD_Table_ID() == MPayment.Table_ID) {
+					pay = new MPayment(ctx, fa.getRecord_ID(), trxName);
 					docs.add(pay);
-					allocs = getOfPosted(ctx, AD_Table_ID, Record_ID, trxName);
+					allocs = getOfPosted(ctx, fa.getAD_Table_ID(), fa.getRecord_ID(), trxName);
 				}
-				else if (AD_Table_ID == MAllocationHdr.Table_ID) {
-					alloc = new MAllocationHdr(ctx, Record_ID, trxName);
+				else if (fa.getAD_Table_ID() == MAllocationHdr.Table_ID) {
+					alloc = new MAllocationHdr(ctx, fa.getRecord_ID(), trxName);
 					allocs.add(alloc);
 				}
 				else
-					continue;
+					return -1;
 
 				//Récupération de toutes les affectations de tous les documents
-				getDocumentsAndOtherAllocations(ctx, C_BPartner_ID, allocs, docs, trxName);
+				getDocumentsAndOtherAllocations(ctx, fa.getC_BPartner_ID(), allocs, docs, trxName);
 
 				if (allocs.size() > 0 && docs.size() > 0) {
 					//Fabrique une clause where pour retrouver les écritures comptables concernés des documents et des affectations
-					String SQLWhereFact = getSQLWhereForFactAcct(allocs, docs) + " AND Account_ID =" + Account_ID;
+					String SQLWhereFact = getSQLWhereForFactAcct(allocs, docs) + " AND Account_ID =" + fa.getAccount_ID();
 
 					//Récupération des ID des écr comptables sous forme d'une chaine de caractère séparée par des virgules 
 					String listFactAcctIDs = "";
@@ -130,11 +162,11 @@ public class LfrFactReconciliationUtil {
 					MaxDateAcct = getMaxDateAcct(SQLWhereFact, trxName);
 
 					//Insertion dans la table Fact_Reconciliation des écritures comptables d'un même lettrage
-					retValue = InsertAndUpdateXXA_Lettrage(ctx, MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_BPartner, listFactAcctIDs, /*IsLettrageCodeTemp, */MaxDateAcct, C_BPartner_ID, C_AcctSchema_ID, trxName);
+					retValue = insertAndUpdateXXA_Lettrage(ctx, MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_BPartner, listFactAcctIDs, /*IsLettrageCodeTemp, */MaxDateAcct, fa.getC_BPartner_ID(), fa.getC_AcctSchema_ID(), trxName);
 
 					nbLettrees += retValue;
 				}
-			}
+//			}
 		}
 		catch (Exception e) {
 			s_log.log(Level.SEVERE, "Erreur dans LettrageBPartner", e);
@@ -148,8 +180,7 @@ public class LfrFactReconciliationUtil {
 	}	// LettrageFactAcct
 	
 	/** Renvoie des ID d'écritures comptables sous forme de chaine de caractères */
-	static String getlistFactAcctIDs (String SQLWhereClause, String trxName) 
-	{
+	private static String getlistFactAcctIDs (String SQLWhereClause, String trxName) {
 		String listFactAcctIDs = "";
 		int[] faIDs = DB.getIDsEx(trxName, "SELECT Fact_Acct_ID FROM Fact_Acct WHERE " + SQLWhereClause);
 		for (int faID : faIDs)
@@ -265,7 +296,7 @@ public class LfrFactReconciliationUtil {
 	}
 	
 	/** Renvoie la date max parmi toutes les écritures comptables sélectionnées	 */
-	static Timestamp getMaxDateAcct (String SQLWhereClause, String trxName) {
+	public static Timestamp getMaxDateAcct (String SQLWhereClause, String trxName) {
 		return  DB.getSQLValueTSEx(trxName, "SELECT MAX(DateAcct) FROM Fact_Acct WHERE " + SQLWhereClause);
 	}	// getMaxDateAcct
 	
@@ -332,10 +363,10 @@ public class LfrFactReconciliationUtil {
 		return list;
 	}	//	getOfPosted
 	
-	
+	private final static int factReconciliationSequenceID = DB.getSQLValueEx(null, "SELECT AD_Sequence_ID FROM AD_Sequence WHERE Name = 'Fact_Reconciliation' AND IsActive='Y' AND IsTableID='Y' AND IsAutoSequence='Y' AND AD_Client_ID = 0");
 
 	/** Insertion dans la table XXA_Lettrage des écritures comptables d'un même lettrage */
-	private static int InsertAndUpdateXXA_Lettrage(Properties ctx, String lettrageType, String sqlWhere, Timestamp dateLettrage, int recordID, int acctSchemaID, String trxName) {
+	public static int insertAndUpdateXXA_Lettrage(Properties ctx, String lettrageType, String sqlWhere, Timestamp dateLettrage, int recordID, int acctSchemaID, String trxName) {
 		int user_id = Env.getAD_User_ID(ctx);
 		int retvalue = 0;
 
@@ -351,8 +382,7 @@ public class LfrFactReconciliationUtil {
 
 		sql = "INSERT INTO Fact_Reconciliation" 
 				+ " (Fact_Reconciliation_ID, Fact_Reconciliation_UU, AD_Client_ID, AD_Org_ID, Created, CreatedBy, Updated, UpdatedBy, IsActive, Fact_Acct_ID) " 
-				//	+ "SELECT nextIDFunc(?, 'N')"
-				+ " SELECT nextidfunc((SELECT AD_Sequence_ID FROM AD_Sequence WHERE Name = 'Fact_Reconciliation' AND IsActive='Y' AND IsTableID='Y' AND IsAutoSequence='Y' AND AD_Client_ID = 0), 'N')"
+				+ " SELECT nextidfunc(" + factReconciliationSequenceID + ", 'N')"
 				+ ", generate_uuid(), AD_Client_ID, AD_Org_ID, Sysdate, " + user_id + ", Sysdate, " + user_id + ", IsActive, Fact_Acct_ID " 
 				+ "FROM Fact_Acct fa " 
 				+ "WHERE NOT EXISTS (SELECT 1 FROM Fact_Reconciliation l " 
@@ -379,8 +409,7 @@ public class LfrFactReconciliationUtil {
 	/**
 	 * Identifie le tiers de l'affectation ; le même tiers doit figurer sur toutes les lignes
 	 **/
-	public static int getAllocBPartnerID(Properties ctx, MAllocationHdr alloc, String trxName)
-	{
+	private static int getAllocBPartnerID(Properties ctx, MAllocationHdr alloc, String trxName) {
 		MAllocationLine[] lines = alloc.getLines(true);
 
 		ArrayList<Integer> listBP = new ArrayList<Integer>();
@@ -395,20 +424,20 @@ public class LfrFactReconciliationUtil {
 		else
 			return listBP.get(0);
 	}
-	
+
 	/** Renvoie les comptes identifiés comme étant des auxilliaires */
-	public static int[] getElementValueBPartnerID(Properties ctx, int AD_Client_ID, int acctSchemaID, String trxName)
-	{ // TODO il faut chercher ces comptes selon le schéma comptable
-		String sql = "SELECT C_ElementValue_ID FROM C_ElementValue ev " +
-				"WHERE BPartnerType IS NOT NULL " 
-				+ "AND ev.IsActive='Y' AND ev.IsSummary='N' " 
-				+ "AND ev.C_Element_ID IN (SELECT C_Element_ID FROM C_AcctSchema_Element ase WHERE ase.ElementType='AC' AND ase.AD_Client_ID=" + AD_Client_ID + " AND C_AcctSchema_ID = " + acctSchemaID + ") ";
-		
-		return DB.getIDsEx(trxName, sql);		
-	}
-	
+	private static int[] getElementValueBPartnerID(Properties ctx, int AD_Client_ID, int acctSchemaID, String trxName) {
+
+	String sql = "SELECT C_ElementValue_ID FROM C_ElementValue ev" 
+			+ " WHERE BPartnerType IS NOT NULL " 
+			+ "AND ev.IsActive='Y' AND ev.IsSummary='N' " 
+			+ "AND ev.C_Element_ID IN (SELECT C_Element_ID FROM C_AcctSchema_Element ase WHERE ase.ElementType='AC' AND ase.AD_Client_ID=" + AD_Client_ID + " AND C_AcctSchema_ID = " + acctSchemaID + ") ";
+
+	return DB.getIDsEx(trxName, sql);		
+}
+
 	/** Lettre les écritures d'une affectation */
-	public static int LettrageAlloc(Properties ctx, MAllocationHdr alloc, int AD_Client_ID, int C_AcctSchema_ID, int Account_ID, String trxName)
+	public static String lettrageAlloc(Properties ctx, MAllocationHdr alloc, int C_AcctSchema_ID, int Account_ID, String trxName)
 	{
 		int nbLettrees=0;
 		ArrayList<MAllocationHdr> allocs = new ArrayList<MAllocationHdr>();
@@ -417,7 +446,7 @@ public class LfrFactReconciliationUtil {
 		try {
 			int C_BPartner_ID = getAllocBPartnerID(ctx, alloc, trxName);
 			if (C_BPartner_ID <= 0)
-				return -1;	// concerne plusieurs tiers, impossible de lettrer
+				return alloc.getDocumentInfo() + " concerne plusieurs tiers";	// concerne plusieurs tiers, impossible de lettrer
 
 			allocs = new ArrayList<MAllocationHdr>();
 			docs = new ArrayList<Object>();
@@ -436,7 +465,7 @@ public class LfrFactReconciliationUtil {
 					comptesAux = new int[list.size()];
 				}
 				else
-					comptesAux = getElementValueBPartnerID(ctx, AD_Client_ID, C_AcctSchema_ID, trxName);
+					comptesAux = getElementValueBPartnerID(ctx, alloc.getAD_Client_ID(), C_AcctSchema_ID, trxName);
 
 				for (int elementValueID : comptesAux) {
 					String SQLWhereFactEV = SQLWhereFact + " AND Account_ID=" + elementValueID;
@@ -450,7 +479,7 @@ public class LfrFactReconciliationUtil {
 						Timestamp MaxDateAcct = getMaxDateAcct(SQLWhereFactEV, trxName);
 
 						//Insertion dans la table Fact_Reconciliation des écritures comptables d'un même lettrage
-						InsertAndUpdateXXA_Lettrage(ctx, MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_BPartner, FactAcctIDs,/* IsMatcheCodeTemp,*/ MaxDateAcct, C_BPartner_ID, C_AcctSchema_ID, trxName);
+						insertAndUpdateXXA_Lettrage(ctx, MLFRFactReconciliationCode.LFR_FACTRECONCILIATIONTYPE_BPartner, FactAcctIDs,/* IsMatcheCodeTemp,*/ MaxDateAcct, C_BPartner_ID, C_AcctSchema_ID, trxName);
 					}
 				}
 			}
@@ -458,9 +487,9 @@ public class LfrFactReconciliationUtil {
 		catch (Exception e) {
 			s_log.log(Level.SEVERE, "Erreur dans LettrageAlloc - C_AllocationHdr_ID="+C_AllocationHdr_ID, e);
 			e.printStackTrace();
-			return -1; // si erreur on renvoie -1
+			return "Erreur "; // si erreur on renvoie -1
 		}
-		return nbLettrees;
+		return Integer.toString(nbLettrees);
 	}	// LettrageAlloc
 
 	/**
@@ -501,22 +530,29 @@ public class LfrFactReconciliationUtil {
 	 * 	Le document a-t-il des écritures qui sont lettrées ?
 	 *	@return MatchCode
 	 */
-	public static String getMatchCodeOfFactAcct(int AcctSchema_ID, int AD_Table_ID, int Record_ID, int Line_ID, int Account_ID, String trxName)
+	private static String getMatchCodeOfFactAcct(MFactAcct fa, String trxName)
 	{
 		StringBuilder sql = new StringBuilder("SELECT l.MatchCode FROM Fact_Acct fa") 
-		.append(" INNER JOIN Fact_Reconciliation l ON (fa.Fact_Acct_ID = l.Fact_Acct_ID)") 
-		.append(" WHERE fa.AD_Table_ID = ").append(AD_Table_ID) 
-		.append(" AND fa.Record_ID = ").append(Record_ID);
-
-		if (AcctSchema_ID > 0)
-			sql.append(" AND fa.C_AcctSchema_ID = ").append(AcctSchema_ID);
-		if (Line_ID > 0)
-			sql.append(" AND fa.Line_ID = ").append(Line_ID);
-		if (Account_ID > 0)
-			sql.append(" AND fa.Account_ID = ").append(Account_ID);
-
+				.append(" INNER JOIN Fact_Reconciliation l ON (fa.Fact_Acct_ID = l.Fact_Acct_ID)") 
+				.append(" WHERE fa.AD_Table_ID = ").append(fa.getAD_Table_ID()) 
+				.append(" AND fa.Record_ID = ").append(fa.getRecord_ID());
+		
+		sql.append(" AND fa.C_AcctSchema_ID = ").append(fa.getC_AcctSchema_ID());
+		
+		if (fa.getLine_ID() > 0)
+			sql.append(" AND fa.Line_ID = ").append(fa.getLine_ID());
+		if (fa.getAccount_ID() > 0)
+			sql.append(" AND fa.Account_ID = ").append(fa.getAccount_ID());
+		
 		String matchcode = DB.getSQLValueString(trxName, sql.toString());
 		return matchcode;
 	}
 
+	public static int getCompteAuxiliaireClient(Object acctSchemaID, Object bpartnerID) {
+		return DB.getSQLValueEx(null, "SELECT vc.Account_ID FROM C_BP_Customer_Acct bpa, C_ValidCombination vc WHERE bpa.C_Receivable_Acct = vc.C_ValidCombination_ID AND bpa.C_AcctSchema_ID = ? AND bpa.C_BPartner_ID = ?", acctSchemaID, bpartnerID);
+	}
+
+	public static int getCompteAuxiliaireFournisseur(Object acctSchemaID, Object bpartnerID) {
+		return DB.getSQLValueEx(null, "SELECT vc.Account_ID FROM C_BP_Vendor_Acct bpa, C_ValidCombination vc WHERE bpa.V_Liability_Acct = vc.C_ValidCombination_ID AND bpa.C_AcctSchema_ID = ? AND bpa.C_BPartner_ID = ?", acctSchemaID, bpartnerID);
+	}
 }

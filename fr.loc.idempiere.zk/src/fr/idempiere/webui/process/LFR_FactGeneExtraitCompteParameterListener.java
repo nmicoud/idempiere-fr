@@ -23,41 +23,32 @@
  * - Nicolas Micoud - TGI                                              *
  **********************************************************************/
 
-package fr.idempiere.callout;
+package fr.idempiere.webui.process;
 
-import static fr.idempiere.model.SystemIDs_LFR.C_INVOICELINE_LFR_IMPUTATIONDATEDEB;
-import static fr.idempiere.model.SystemIDs_LFR.C_INVOICELINE_LFR_IMPUTATIONDATEFIN;
+import static fr.idempiere.webui.apps.form.WLFRFactExtraitCompte.CTX_LFR_FACT_EXTRAIT_COMPTE_PANEL;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.adempiere.webui.apps.IProcessParameterListener;
+import org.adempiere.webui.apps.ProcessParameterPanel;
+import org.adempiere.webui.editor.WEditor;
+import org.compiere.util.Env;
 
-import org.adempiere.base.IColumnCallout;
-import org.adempiere.base.IColumnCalloutFactory;
-import org.compiere.model.MBPBankAccount;
-import org.compiere.model.MInvoiceLine;
+/**
+ *  Mécanismes liés aux process basés sur LFR_FactAux
+ *  @author Nicolas Micoud - TGI
+ */
+public class LFR_FactGeneExtraitCompteParameterListener implements IProcessParameterListener {
 
-import fr.idempiere.model.MLFRPaySelectionPrepayment;
+	@Override
+	public void onChange(ProcessParameterPanel parameterPanel, String columnName, WEditor editor) {
 
-public class LfrCalloutFactory implements IColumnCalloutFactory{
 
-	public IColumnCallout[] getColumnCallouts(String tableName, String columnName) {
-
-		List<IColumnCallout> list = new ArrayList<IColumnCallout>();
-
-		if (tableName.equals(MBPBankAccount.Table_Name)) {
-			if (columnName.equals(MBPBankAccount.COLUMNNAME_C_BPartner_ID))
-				list.add(new LfrCallout());
+		if (Env.getContext(Env.getCtx(), parameterPanel.getWindowNo(), CTX_LFR_FACT_EXTRAIT_COMPTE_PANEL).equals("")) {
+			if (columnName.equals("LFR_AccountSelection") && editor.getValue() != null) {
+				parameterPanel.getEditor("Account_ID").setValue(null);
+				parameterPanel.getEditorTo("Account_ID").setValue(null);
+			}
+			else if (columnName.startsWith("Account_ID") && editor.getValue() != null)
+				parameterPanel.getEditor("LFR_AccountSelection").setValue(null);
 		}
-		else if (tableName.equals(MLFRPaySelectionPrepayment.Table_Name)) {
-			if (columnName.equals(MLFRPaySelectionPrepayment.COLUMNNAME_C_Payment_ID))
-				list.add(new LfrCallout());
-		}
-		else if (tableName.equals(MInvoiceLine.Table_Name))
-		{
-			if (columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEDEB) || columnName.equals(C_INVOICELINE_LFR_IMPUTATIONDATEFIN))
-				list.add(new LfrCallout());
-		}
-
-		return list != null ? list.toArray(new IColumnCallout[0]) : new IColumnCallout[0];
 	}
 }

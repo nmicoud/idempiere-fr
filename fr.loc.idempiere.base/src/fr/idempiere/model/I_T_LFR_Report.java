@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for T_LFR_Report
  *  @author iDempiere (generated) 
- *  @version Release 10
+ *  @version Release 12
  */
 @SuppressWarnings("all")
 public interface I_T_LFR_Report 
@@ -32,7 +32,7 @@ public interface I_T_LFR_Report
     /** TableName=T_LFR_Report */
     public static final String Table_Name = "T_LFR_Report";
 
-    /** AD_Table_ID=1000007 */
+    /** AD_Table_ID=1000976 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -42,28 +42,6 @@ public interface I_T_LFR_Report
     BigDecimal accessLevel = BigDecimal.valueOf(7);
 
     /** Load Meta Data */
-
-    /** Column name Account_Name */
-    public static final String COLUMNNAME_Account_Name = "Account_Name";
-
-	/** Set Account Name	  */
-	public void setAccount_Name (String Account_Name);
-
-	/** Get Account Name	  */
-	public String getAccount_Name();
-
-    /** Column name AccountValue */
-    public static final String COLUMNNAME_AccountValue = "AccountValue";
-
-	/** Set Account Key.
-	  * Key of Account Element
-	  */
-	public void setAccountValue (String AccountValue);
-
-	/** Get Account Key.
-	  * Key of Account Element
-	  */
-	public String getAccountValue();
 
     /** Column name AD_Client_ID */
     public static final String COLUMNNAME_AD_Client_ID = "AD_Client_ID";
@@ -100,6 +78,28 @@ public interface I_T_LFR_Report
 	public int getAD_PInstance_ID();
 
 	public org.compiere.model.I_AD_PInstance getAD_PInstance() throws RuntimeException;
+
+    /** Column name AccountValue */
+    public static final String COLUMNNAME_AccountValue = "AccountValue";
+
+	/** Set Account Key.
+	  * Key of Account Element
+	  */
+	public void setAccountValue (String AccountValue);
+
+	/** Get Account Key.
+	  * Key of Account Element
+	  */
+	public String getAccountValue();
+
+    /** Column name Account_Name */
+    public static final String COLUMNNAME_Account_Name = "Account_Name";
+
+	/** Set Account Name	  */
+	public void setAccount_Name (String Account_Name);
+
+	/** Get Account Name	  */
+	public String getAccount_Name();
 
     /** Column name AmtAcct */
     public static final String COLUMNNAME_AmtAcct = "AmtAcct";
@@ -148,6 +148,36 @@ public interface I_T_LFR_Report
 
 	/** Get BP Name	  */
 	public String getBPName();
+
+    /** Column name C_AcctSchema_ID */
+    public static final String COLUMNNAME_C_AcctSchema_ID = "C_AcctSchema_ID";
+
+	/** Set Accounting Schema.
+	  * Rules for accounting
+	  */
+	public void setC_AcctSchema_ID (int C_AcctSchema_ID);
+
+	/** Get Accounting Schema.
+	  * Rules for accounting
+	  */
+	public int getC_AcctSchema_ID();
+
+	public org.compiere.model.I_C_AcctSchema getC_AcctSchema() throws RuntimeException;
+
+    /** Column name C_BPartner_ID */
+    public static final String COLUMNNAME_C_BPartner_ID = "C_BPartner_ID";
+
+	/** Set Business Partner.
+	  * Identifies a Business Partner
+	  */
+	public void setC_BPartner_ID (int C_BPartner_ID);
+
+	/** Get Business Partner.
+	  * Identifies a Business Partner
+	  */
+	public int getC_BPartner_ID();
+
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException;
 
     /** Column name C_ElementValue_ID */
     public static final String COLUMNNAME_C_ElementValue_ID = "C_ElementValue_ID";
@@ -215,6 +245,19 @@ public interface I_T_LFR_Report
 	  */
 	public String getDescription();
 
+    /** Column name DocTypeName */
+    public static final String COLUMNNAME_DocTypeName = "DocTypeName";
+
+	/** Set Document Type Name.
+	  * Name of the Document Type
+	  */
+	public void setDocTypeName (String DocTypeName);
+
+	/** Get Document Type Name.
+	  * Name of the Document Type
+	  */
+	public String getDocTypeName();
+
     /** Column name Fact_Acct_ID */
     public static final String COLUMNNAME_Fact_Acct_ID = "Fact_Acct_ID";
 
@@ -253,6 +296,19 @@ public interface I_T_LFR_Report
 	public int getGL_Category_ID();
 
 	public org.compiere.model.I_GL_Category getGL_Category() throws RuntimeException;
+
+    /** Column name HeaderCenter */
+    public static final String COLUMNNAME_HeaderCenter = "HeaderCenter";
+
+	/** Set Header Center.
+	  * Content of the center portion of the header.
+	  */
+	public void setHeaderCenter (String HeaderCenter);
+
+	/** Get Header Center.
+	  * Content of the center portion of the header.
+	  */
+	public String getHeaderCenter();
 
     /** Column name IsSummary */
     public static final String COLUMNNAME_IsSummary = "IsSummary";
@@ -293,6 +349,105 @@ public interface I_T_LFR_Report
 
 	/** Get LFR_AmtAcctPrecDr	  */
 	public BigDecimal getLFR_AmtAcctPrecDr();
+
+    /** Column name LFR_AmtDebutCr */
+    public static final String COLUMNNAME_LFR_AmtDebutCr = "LFR_AmtDebutCr";
+
+	/** Set LFR_AmtDebutCr	  */
+	public void setLFR_AmtDebutCr (BigDecimal LFR_AmtDebutCr);
+
+	/** Get LFR_AmtDebutCr	  */
+	public BigDecimal getLFR_AmtDebutCr();
+
+    /** Column name LFR_AmtDebutDr */
+    public static final String COLUMNNAME_LFR_AmtDebutDr = "LFR_AmtDebutDr";
+
+	/** Set LFR_AmtDebutDr	  */
+	public void setLFR_AmtDebutDr (BigDecimal LFR_AmtDebutDr);
+
+	/** Get LFR_AmtDebutDr	  */
+	public BigDecimal getLFR_AmtDebutDr();
+
+    /** Column name LFR_AmtFinalCr */
+    public static final String COLUMNNAME_LFR_AmtFinalCr = "LFR_AmtFinalCr";
+
+	/** Set LFR_AmtFinalCr	  */
+	public void setLFR_AmtFinalCr (BigDecimal LFR_AmtFinalCr);
+
+	/** Get LFR_AmtFinalCr	  */
+	public BigDecimal getLFR_AmtFinalCr();
+
+    /** Column name LFR_AmtFinalDr */
+    public static final String COLUMNNAME_LFR_AmtFinalDr = "LFR_AmtFinalDr";
+
+	/** Set LFR_AmtFinalDr	  */
+	public void setLFR_AmtFinalDr (BigDecimal LFR_AmtFinalDr);
+
+	/** Get LFR_AmtFinalDr	  */
+	public BigDecimal getLFR_AmtFinalDr();
+
+    /** Column name LFR_AmtPeriodeDef */
+    public static final String COLUMNNAME_LFR_AmtPeriodeDef = "LFR_AmtPeriodeDef";
+
+	/** Set LFR_AmtPeriodeDef	  */
+	public void setLFR_AmtPeriodeDef (BigDecimal LFR_AmtPeriodeDef);
+
+	/** Get LFR_AmtPeriodeDef	  */
+	public BigDecimal getLFR_AmtPeriodeDef();
+
+    /** Column name LFR_AmtPeriodeDefCr */
+    public static final String COLUMNNAME_LFR_AmtPeriodeDefCr = "LFR_AmtPeriodeDefCr";
+
+	/** Set LFR_AmtPeriodeDefCr	  */
+	public void setLFR_AmtPeriodeDefCr (BigDecimal LFR_AmtPeriodeDefCr);
+
+	/** Get LFR_AmtPeriodeDefCr	  */
+	public BigDecimal getLFR_AmtPeriodeDefCr();
+
+    /** Column name LFR_AmtPeriodeDefDr */
+    public static final String COLUMNNAME_LFR_AmtPeriodeDefDr = "LFR_AmtPeriodeDefDr";
+
+	/** Set LFR_AmtPeriodeDefDr	  */
+	public void setLFR_AmtPeriodeDefDr (BigDecimal LFR_AmtPeriodeDefDr);
+
+	/** Get LFR_AmtPeriodeDefDr	  */
+	public BigDecimal getLFR_AmtPeriodeDefDr();
+
+    /** Column name LFR_AmtPeriodeTemp */
+    public static final String COLUMNNAME_LFR_AmtPeriodeTemp = "LFR_AmtPeriodeTemp";
+
+	/** Set LFR_AmtPeriodeTemp	  */
+	public void setLFR_AmtPeriodeTemp (BigDecimal LFR_AmtPeriodeTemp);
+
+	/** Get LFR_AmtPeriodeTemp	  */
+	public BigDecimal getLFR_AmtPeriodeTemp();
+
+    /** Column name LFR_AmtPeriodeTempCr */
+    public static final String COLUMNNAME_LFR_AmtPeriodeTempCr = "LFR_AmtPeriodeTempCr";
+
+	/** Set LFR_AmtPeriodeTempCr	  */
+	public void setLFR_AmtPeriodeTempCr (BigDecimal LFR_AmtPeriodeTempCr);
+
+	/** Get LFR_AmtPeriodeTempCr	  */
+	public BigDecimal getLFR_AmtPeriodeTempCr();
+
+    /** Column name LFR_AmtPeriodeTempDr */
+    public static final String COLUMNNAME_LFR_AmtPeriodeTempDr = "LFR_AmtPeriodeTempDr";
+
+	/** Set LFR_AmtPeriodeTempDr	  */
+	public void setLFR_AmtPeriodeTempDr (BigDecimal LFR_AmtPeriodeTempDr);
+
+	/** Get LFR_AmtPeriodeTempDr	  */
+	public BigDecimal getLFR_AmtPeriodeTempDr();
+
+    /** Column name LFR_BPartnerDisplayName */
+    public static final String COLUMNNAME_LFR_BPartnerDisplayName = "LFR_BPartnerDisplayName";
+
+	/** Set LFR_BPartnerDisplayName	  */
+	public void setLFR_BPartnerDisplayName (String LFR_BPartnerDisplayName);
+
+	/** Get LFR_BPartnerDisplayName	  */
+	public String getLFR_BPartnerDisplayName();
 
     /** Column name LFR_BalanceGeneRegrLevel */
     public static final String COLUMNNAME_LFR_BalanceGeneRegrLevel = "LFR_BalanceGeneRegrLevel";
@@ -339,6 +494,15 @@ public interface I_T_LFR_Report
 	/** Get LFR_DateAsString	  */
 	public String getLFR_DateAsString();
 
+    /** Column name LFR_FactAcctDescription */
+    public static final String COLUMNNAME_LFR_FactAcctDescription = "LFR_FactAcctDescription";
+
+	/** Set LFR_FactAcctDescription	  */
+	public void setLFR_FactAcctDescription (String LFR_FactAcctDescription);
+
+	/** Get LFR_FactAcctDescription	  */
+	public String getLFR_FactAcctDescription();
+
     /** Column name LFR_FactAcctOrg */
     public static final String COLUMNNAME_LFR_FactAcctOrg = "LFR_FactAcctOrg";
 
@@ -347,6 +511,51 @@ public interface I_T_LFR_Report
 
 	/** Get LFR_FactAcctOrg	  */
 	public String getLFR_FactAcctOrg();
+
+    /** Column name LFR_GLCategoryPrintName */
+    public static final String COLUMNNAME_LFR_GLCategoryPrintName = "LFR_GLCategoryPrintName";
+
+	/** Set LFR_GLCategoryPrintName	  */
+	public void setLFR_GLCategoryPrintName (String LFR_GLCategoryPrintName);
+
+	/** Get LFR_GLCategoryPrintName	  */
+	public String getLFR_GLCategoryPrintName();
+
+    /** Column name LFR_MatchCode */
+    public static final String COLUMNNAME_LFR_MatchCode = "LFR_MatchCode";
+
+	/** Set LFR_MatchCode	  */
+	public void setLFR_MatchCode (String LFR_MatchCode);
+
+	/** Get LFR_MatchCode	  */
+	public String getLFR_MatchCode();
+
+    /** Column name LFR_NumEcriture */
+    public static final String COLUMNNAME_LFR_NumEcriture = "LFR_NumEcriture";
+
+	/** Set LFR_NumEcriture	  */
+	public void setLFR_NumEcriture (int LFR_NumEcriture);
+
+	/** Get LFR_NumEcriture	  */
+	public int getLFR_NumEcriture();
+
+    /** Column name LFR_ReconciliationDate */
+    public static final String COLUMNNAME_LFR_ReconciliationDate = "LFR_ReconciliationDate";
+
+	/** Set LFR_ReconciliationDate	  */
+	public void setLFR_ReconciliationDate (Timestamp LFR_ReconciliationDate);
+
+	/** Get LFR_ReconciliationDate	  */
+	public Timestamp getLFR_ReconciliationDate();
+
+    /** Column name LFR_SoldeProgressif */
+    public static final String COLUMNNAME_LFR_SoldeProgressif = "LFR_SoldeProgressif";
+
+	/** Set LFR_SoldeProgressif	  */
+	public void setLFR_SoldeProgressif (BigDecimal LFR_SoldeProgressif);
+
+	/** Get LFR_SoldeProgressif	  */
+	public BigDecimal getLFR_SoldeProgressif();
 
     /** Column name Line */
     public static final String COLUMNNAME_Line = "Line";
@@ -373,6 +582,19 @@ public interface I_T_LFR_Report
 	  * Name of the Organization
 	  */
 	public String getOrgName();
+
+    /** Column name PostingType */
+    public static final String COLUMNNAME_PostingType = "PostingType";
+
+	/** Set Posting Type.
+	  * The type of posted amount for the transaction
+	  */
+	public void setPostingType (String PostingType);
+
+	/** Get Posting Type.
+	  * The type of posted amount for the transaction
+	  */
+	public String getPostingType();
 
     /** Column name PrintName */
     public static final String COLUMNNAME_PrintName = "PrintName";

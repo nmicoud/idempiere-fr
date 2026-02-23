@@ -26,14 +26,9 @@
 package fr.idempiere.model;
 
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.util.Properties;
 
-import org.compiere.model.MDocType;
 import org.compiere.util.DB;
-import org.compiere.util.Msg;
-
-import fr.idempiere.util.LfrUtil;
 
 /**
  * Temp table for LFR reports
@@ -63,23 +58,4 @@ public class MTLFRReport extends X_T_LFR_Report {
 		return DB.getSQLValueEx(trxName, "SELECT AD_Sequence_ID FROM AD_Sequence WHERE Name = ? AND	IsActive = 'Y' AND IsTableID = 'Y' AND IsAutoSequence = 'Y' AND AD_Client_ID = 0", Table_Name);
 	}
 
-	/** Renvoie un String qui précise quelles dates sont utilisées dans l'état */
-	public static String getDateCriteres(Properties ctx, int clientID, Timestamp dateFrom, Timestamp dateTo) {
-		if (dateFrom != null && dateTo != null)
-			return Msg.getMsg(ctx, "LFR_CritereDateBetween", new Object[] {LfrUtil.formatDate(ctx, clientID, dateFrom), LfrUtil.formatDate(ctx, clientID, dateTo)});
-		else if (dateFrom != null && dateTo == null)
-			return Msg.getMsg(ctx, "LFR_CritereDateFrom", new Object[] {LfrUtil.formatDate(ctx, clientID, dateFrom)});
-		else if (dateFrom == null && dateTo != null)
-			return Msg.getMsg(ctx, "LFR_CritereDateUntil", new Object[] {LfrUtil.formatDate(ctx, clientID, dateTo)});
-		else
-			return Msg.getMsg(ctx, "LFR_NoCritereDate");		
-	}
-
-	public static int getDocTypeForBankStatement(Properties ctx) {
-		return MDocType.getOfDocBaseType(ctx, MDocType.DOCBASETYPE_BankStatement)[0].getC_DocType_ID();
-	}
-
-	public static int getDocTypeForAllocation(Properties ctx) {
-		return MDocType.getOfDocBaseType(ctx, MDocType.DOCBASETYPE_PaymentAllocation)[0].getC_DocType_ID();
-	}
 }

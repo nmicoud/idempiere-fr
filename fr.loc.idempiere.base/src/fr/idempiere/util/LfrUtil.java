@@ -25,15 +25,24 @@
 
 package fr.idempiere.util;
 
+import static fr.idempiere.model.SystemIDs_LFR.LFR_FEC_PER_ORG;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MClient;
+import org.compiere.model.MRole;
+import org.compiere.model.MSysConfig;
+import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.TimeUtil;
 import org.compiere.util.Util;
@@ -103,5 +112,61 @@ public class LfrUtil extends Util {
 		}
 
 		return true; // Résultat OK  
+	}
+
+	/** Renvoie un tableau de bytes à partir d'un fichier */
+	public static byte[] readFile(File file) throws IOException { // http://stackoverflow.com/questions/858980/file-to-byte-in-java
+
+		ByteArrayOutputStream ous = null;
+		InputStream ios = null;
+		try {
+			byte[] buffer = new byte[4096];
+			ous = new ByteArrayOutputStream();
+			ios = new FileInputStream(file);
+			int read = 0;
+			while ( (read = ios.read(buffer)) != -1 ) {
+				ous.write(buffer, 0, read);
+			}
+		} finally { 
+			try {
+				if ( ous != null ) 
+					ous.close();
+			} catch ( IOException e) {
+				throw new AdempiereException(e);
+			}
+
+			try {
+				if ( ios != null ) 
+					ios.close();
+			} catch ( IOException e) {
+				throw new AdempiereException(e);
+			}
+		}
+		return ous.toByteArray();
+	}
+	
+	/** Ajout du text dans le sb avec séparateur */
+	public static void add(StringBuilder sb, String text, String sep) {
+
+		if (!Util.isEmpty(text)) {
+			if (sb.length() > 0)
+				sb.append(sep);
+
+			sb.append(text);
+		}
+	}
+
+	/** Renvoie true si le rôle connecté peut accéder au process, false dans les autres cas (accès non autorisé ou null) */
+	public static boolean getProcessAccess(int processID) {
+		Boolean access = MRole.get(Env.getCtx(), Env.getAD_Role_ID(Env.getCtx())).getProcessAccess(processID);
+		if (access != null && access.booleanValue())
+			return true;
+		else
+			return false;
+	}
+
+	/** Renvoie true si le Fichier des Ecritures Comptables doit se faire par organisation */
+	public static boolean isFecPerOrg(int clientID) {
+		return MSysConfig.getBooleanValue(LFR_FEC_PER_ORG, false, clientID);
 	}
 }

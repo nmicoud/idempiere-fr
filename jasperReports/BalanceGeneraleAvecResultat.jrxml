@@ -15,7 +15,7 @@
 	<import value="net.sf.jasperreports.engine.data.*"/>
 	<parameter name="AD_PINSTANCE_ID" class="java.lang.Integer"/>
 	<queryString>
-		<![CDATA[SELECT AmtAcctDr, LFR_AmtAcctPrecDr, AmtAcctCr, LFR_AmtAcctPrecCr, LFR_CL1, LFR_CL2, LFR_CL3, LFR_BalanceGeneRegrLevel, Account_Name, IsSummary, AccountValue, ClientName, OrgName, LFR_DateAsString, FooterCenter, Title
+		<![CDATA[SELECT AmtAcctDr, LFR_AmtAcctPrecDr, AmtAcctCr, LFR_AmtAcctPrecCr, LFR_CL1, LFR_CL2, LFR_CL3, LFR_BalanceGeneRegrLevel, Account_Name, IsSummary, AccountValue, ClientName, OrgName, LFR_DateAsString, FooterCenter, Title, AmtAcct
 FROM T_LFR_Report WHERE AD_PInstance_ID = $P{AD_PINSTANCE_ID} ORDER BY Line]]>
 	</queryString>
 	<field name="AMTACCTDR" class="java.math.BigDecimal">
@@ -82,6 +82,10 @@ FROM T_LFR_Report WHERE AD_PInstance_ID = $P{AD_PINSTANCE_ID} ORDER BY Line]]>
 		<property name="com.jaspersoft.studio.field.name" value="TITLE"/>
 		<property name="com.jaspersoft.studio.field.label" value="TITLE"/>
 	</field>
+	<field name="AMTACCT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AMTACCT"/>
+		<property name="com.jaspersoft.studio.field.label" value="AMTACCT"/>
+	</field>
 	<variable name="CL3_Mvts_Debit" class="java.math.BigDecimal" resetType="Group" resetGroup="CL3" calculation="Sum">
 		<variableExpression><![CDATA[$F{AMTACCTDR}]]></variableExpression>
 	</variable>
@@ -135,6 +139,11 @@ FROM T_LFR_Report WHERE AD_PInstance_ID = $P{AD_PINSTANCE_ID} ORDER BY Line]]>
 	</variable>
 	<variable name="Compte_Prec_Solde" class="java.math.BigDecimal" resetType="Group" resetGroup="COMPTE">
 		<variableExpression><![CDATA[new java.math.BigDecimal(  ($F{LFR_AMTACCTPRECDR}.doubleValue()) - ($F{LFR_AMTACCTPRECCR}.doubleValue()) )]]></variableExpression>
+	</variable>
+	<variable name="Resultat_Current" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[("6".equals($F{LFR_CL1}) || "7".equals($F{LFR_CL1}))
+    ? $F{AMTACCT}
+    : new java.math.BigDecimal ("0")]]></variableExpression>
 	</variable>
 	<group name="CL1">
 		<groupExpression><![CDATA[$F{LFR_CL1}]]></groupExpression>
@@ -709,7 +718,7 @@ FROM T_LFR_Report WHERE AD_PInstance_ID = $P{AD_PINSTANCE_ID} ORDER BY Line]]>
 				<textFieldExpression><![CDATA[$F{ORGNAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
-				<reportElement key="textField-48" mode="Opaque" x="1" y="18" width="535" height="25" backcolor="#CCCCCC" uuid="b56121ab-8053-44e1-9930-09053ab7857d"/>
+				<reportElement key="textField-48" mode="Opaque" x="1" y="18" width="535" height="25" backcolor="#CCCCCC" uuid="be6710c1-d289-4715-ad6f-20ab3362f102"/>
 				<textElement textAlignment="Center">
 					<font fontName="SansSerif" size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
@@ -891,7 +900,7 @@ FROM T_LFR_Report WHERE AD_PInstance_ID = $P{AD_PINSTANCE_ID} ORDER BY Line]]>
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="20" splitType="Stretch">
+		<band height="35" splitType="Stretch">
 			<textField pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement key="textField" x="366" y="0" width="57" height="13" uuid="5f482011-fc08-4016-9537-839d23b07462"/>
 				<box>
@@ -956,6 +965,21 @@ FROM T_LFR_Report WHERE AD_PInstance_ID = $P{AD_PINSTANCE_ID} ORDER BY Line]]>
 					<font fontName="DejaVu Sans" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Total Général"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="120" y="22" width="360" height="13" uuid="bd32613a-738d-4a19-ac5c-a3f0ffdd7f22"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font fontName="DejaVu Sans" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Résultat au " + $F{LFR_DATEASSTRING}.substring($F{LFR_DATEASSTRING}.length() - 10 ) + " : "
++ ($V{Resultat_Current}.signum() > 0 ? "Perte" : "Bénéfice") + " de "
++ new java.text.DecimalFormat("#,##0.00").format($V{Resultat_Current}.abs())]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
