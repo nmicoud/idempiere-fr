@@ -71,6 +71,7 @@ public class LFR_FactAux extends LfrProcessFact
 	private int			p_C_ElementValue_ID = 0;
 	private int			p_C_BPartner_From_ID = -1;
 	private int			p_C_BPartner_To_ID = -1;
+	private String 		p_bpartnerIDs = "";
 	private String 		m_accountName = "";
 	private String		m_accountValue = "";
 	private BigDecimal 	m_amtPeriodeTempDebit = Env.ZERO;
@@ -125,6 +126,8 @@ public class LFR_FactAux extends LfrProcessFact
 				p_C_BPartner_From_ID = para[i].getParameterAsInt();
 				p_C_BPartner_To_ID = para[i].getParameter_ToAsInt();
 			}
+			else if (name.equals("LFR_BPartnerCustomerSelection") || name.equals("LFR_BPartnerVendorSelection"))
+				p_bpartnerIDs = para[i].getParameterAsCSVInt();
 			else if (name.equals("LFR_LettrageFiltre"))
 				p_lettrageFiltre = para[i].getParameterAsString();
 			else if (name.equals("LFR_LettrageDateParam"))
@@ -211,10 +214,10 @@ public class LFR_FactAux extends LfrProcessFact
 			ListComptesAux = getComptesAux(compteAux);
 
 		String sqlBPartner = "";
-		if ((p_type.equals(TYPE_EXTRAIT_COMPTE_CLIENT) || p_type.equals(TYPE_EXTRAIT_COMPTE_FOURNISSEUR))
-				&& p_C_BPartner_To_ID==0) {
+		if ((p_type.equals(TYPE_EXTRAIT_COMPTE_CLIENT) || p_type.equals(TYPE_EXTRAIT_COMPTE_FOURNISSEUR)) && !Util.isEmpty(p_bpartnerIDs))
+			sqlBPartner = p_bpartnerIDs;
+		else if ((p_type.equals(TYPE_EXTRAIT_COMPTE_CLIENT) || p_type.equals(TYPE_EXTRAIT_COMPTE_FOURNISSEUR)) && p_C_BPartner_To_ID==0)
 			sqlBPartner = Integer.toString(p_C_BPartner_From_ID);
-		}
 		else {
 			// Sélection des tiers concernés par l'édition
 			StringBuilder bpartnerWhere = new StringBuilder("");
@@ -794,6 +797,8 @@ public class LFR_FactAux extends LfrProcessFact
 				sql.append("AND UPPER(bp.Name) >= (SELECT UPPER(Name) FROM C_BPartner WHERE C_BPartner_ID = ").append(p_C_BPartner_From_ID)
 				.append(") AND UPPER(bp.Name) <= (SELECT UPPER(Name) FROM C_BPartner WHERE C_BPartner_ID = ").append(p_C_BPartner_To_ID).append(") ");
 			}
+			else if (!Util.isEmpty(p_bpartnerIDs))
+				sql.append(" AND bp.C_BPartner_ID IN (").append(p_bpartnerIDs).append(")");
 			else
 				sql.append(" AND bp.C_BPartner_ID = ").append(p_C_BPartner_From_ID);
 		}

@@ -123,7 +123,7 @@ public class LFR_FactGeneExtraitCompte extends LfrProcessFact {
 		if (m_dateAcctFrom == null && p_isSoldeInitial)
 			return "@Error@ impossible d'avoir un solde initial sans date de début";
 
-		if (p_accountFromID <= 0 && p_accountToID <= 0 && Util.isEmpty(p_accountIDs) && p_accountList.length == 0)
+		if (p_accountFromID <= 0 && p_accountToID <= 0 && Util.isEmpty(p_accountIDs) && (p_accountList == null || p_accountList.length == 0))
 			return "@Error@ aucun compte sélectionné pour l'édition";
 
 		String reportTitle = getReportTitle();
