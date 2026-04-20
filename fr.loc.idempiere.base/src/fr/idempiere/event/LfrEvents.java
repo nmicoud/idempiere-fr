@@ -41,6 +41,7 @@ import org.compiere.model.MAcctSchema;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MBPBankAccount;
 import org.compiere.model.MBPartner;
+import org.compiere.model.MBank;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
@@ -186,12 +187,23 @@ public class LfrEvents extends AbstractEventHandler {
 										if (Util.isEmpty(bpba.getIBAN()))
 											pi.addLog(0, null, null, bp.getValue() + " - " + bp.getName() + " : " + "@NotFound@ @IBAN@");
 										else {
+
+											if (bpba.getC_Bank_ID() <= 0)
+												pi.addLog(0, null, null, "Attention : pas de banque pour " + bp.getName());
+											else {
+												MBank bank = MBank.get(bpba.getC_Bank_ID());
+												if (Util.isEmpty(bank.getSwiftCode()))
+													pi.addLog(0, null, null, "Attention : pas de @SwiftCode@ pour pour " + bp.getName());	
+											}
+
 											int locID = DB.getSQLValueEx(trxName, "SELECT bpl.C_Location_ID FROM C_BPartner_Location bpl, C_Invoice i WHERE i.C_BPartner_Location_ID = bpl.C_BPartner_Location_ID AND i.C_Invoice_ID = ?", psl.getC_Invoice_ID());
 											MLocation loc = new MLocation(Env.getCtx(), locID, null);
 											String countryCode = loc.getCountry().getCountryCode();
 
 											if (!countryCode.equals(bpba.getIBAN().substring(0, 2)))
 												pi.addLog(0, null, null, "Attention : Le code pays est '" + countryCode + "' alors que l'IBAN commence avec '" + bpba.getIBAN().substring(0, 2) + "' pour " + bp.getName());
+											if (Util.isEmpty(loc.getAddress1()))
+												pi.addLog(0, null, null, "Attention : pas d'adresse 1 pour " + bp.getName());
 											if (Util.isEmpty(loc.getPostal()))
 												pi.addLog(0, null, null, "Attention : pas de code postal pour " + bp.getName());
 											if (Util.isEmpty(loc.getCity()))

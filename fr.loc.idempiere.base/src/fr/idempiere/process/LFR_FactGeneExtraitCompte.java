@@ -64,8 +64,7 @@ public class LFR_FactGeneExtraitCompte extends LfrProcessFact {
 	private String 		p_accountIDs = "";
 	private int[]		p_accountList = null;
 	private int			p_activityID = 0;
-//	private int			p_XXA_Employee_ID = 0; TODO à faire via C_Employee_ID
-
+	private int			p_employeeID = 0;
 	private Timestamp	m_dateAcctFrom = null;
 	private Timestamp	m_dateAcctTo = null;
 	private boolean		p_isSoldeInitial = false; // Affichage d'un solde initial (si édition demandée à une date différente du 0101N)
@@ -105,8 +104,8 @@ public class LFR_FactGeneExtraitCompte extends LfrProcessFact {
 				p_lettrageDate = para[i].getParameterAsTimestamp();
 			else if (name.equals("C_Activity_ID"))
 				p_activityID = para[i].getParameterAsInt();
-//			else if (name.equals("XXA_Employee_ID"))
-//				p_XXA_Employee_ID = para[i].getParameterAsInt();
+			else if (name.equals("C_Employee_ID"))
+				p_employeeID = para[i].getParameterAsInt();
 		}
 	}	//	prepare
 
@@ -137,8 +136,8 @@ public class LFR_FactGeneExtraitCompte extends LfrProcessFact {
 
 		if (p_activityID > 0)
 			sqlWhere += " AND fa.C_Activity_ID = " + p_activityID;
-//		if (p_XXA_Employee_ID > 0)
-//			sqlWhere += " AND fa.XXA_Employee_ID = " + p_XXA_Employee_ID;
+		if (p_employeeID > 0)
+			sqlWhere += " AND fa.C_Employee_ID = " + p_employeeID;
 
 		if (p_lettrageFiltre.equals("M") || p_lettrageFiltre.equals("N")) {
 			SimpleDateFormat df = DisplayType.getDateFormat(DisplayType.Date);
@@ -165,11 +164,8 @@ public class LFR_FactGeneExtraitCompte extends LfrProcessFact {
 		if (p_activityID > 0)
 			setHeaderCenter(MActivity.get(getCtx(), p_activityID).getName());
 
-//		if (p_XXA_Employee_ID > 0) {
-//			if (headerCenter.length() > 0)
-//				headerCenter.append("\n");
-//			headerCenter.append(MBPartner.get(getCtx(), p_XXA_Employee_ID).getName());
-//		}
+		if (p_employeeID > 0)
+			setHeaderCenter(DB.getSQLValueStringEx(get_TrxName(), "SELECT Name FROM C_BPartner WHERE C_BPartner_ID = ?", p_employeeID));
 
 		String listAccount = ""; // Comptes demandés au travers des paramètres (sélection ou plage de comptes)
 

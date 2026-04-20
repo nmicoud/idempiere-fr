@@ -174,13 +174,13 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 
 		if (getLFR_ODSituationType().contains(LFR_ODSITUATIONTYPE_CCA)) {
 			if (asGL.get_ValueAsInt(C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CCAACCT) <=0) {
-				m_processMsg = "@FillMandatory@ @C_AcctSchema_ID@ > @LFR_ODSituationPrepaCCA_Acct@";
+				m_processMsg = "@FillMandatory@ @C_AcctSchema_ID@ > @" + C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CCAACCT + "@";
 				return DocAction.STATUS_Invalid;
 			}
 		}
 		if (getLFR_ODSituationType().contains(LFR_ODSITUATIONTYPE_CAP)) {
 			if (asGL.get_ValueAsInt(C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CAPACCT) <=0 || asGL.get_ValueAsInt(C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_TCAPACCT) <=0) {
-				m_processMsg = "@FillMandatory@ @C_AcctSchema_ID@ > @LFR_ODSituationPrepaCAP_Acct@ / @LFR_ODSituationPrepaTCAP_Acct@";
+				m_processMsg = "@FillMandatory@ @C_AcctSchema_ID@ > @" + C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_CAPACCT + "@ / @" + C_ACCTSCHEMA_GL_LFR_ODSITUATIONPREPA_TCAPACCT + "@";
 				return DocAction.STATUS_Invalid;
 			}
 		}
@@ -360,7 +360,7 @@ public class MLFRODSituationPrepa extends X_LFR_ODSituationPrepa implements DocA
 		else if (type.equals(MLFRODSituationPrepa.LFR_ODSITUATIONTYPE_CAP)) // factures achat avec date facture > date situation et date début imputation < date situation
 			sql.append(" AND TRUNC(i.DateAcct, 'DD') > ").append(DB.TO_DATE(dateSituation)).append(" AND TRUNC(il." + C_INVOICELINE_LFR_IMPUTATIONDATEDEB + ", 'DD') < ").append(DB.TO_DATE(dateSituation));
 
-		sql.append("AND NOT EXISTS (SELECT * FROM LFR_ODSituationPrepaLine spl")
+		sql.append(" AND NOT EXISTS (SELECT * FROM LFR_ODSituationPrepaLine spl")
 		.append(" WHERE fa.Fact_Acct_ID = spl.Fact_Acct_ID")
 		.append(" AND spl.LFR_ODSituationPrepa_ID = ").append(getLFR_ODSituationPrepa_ID()).append(")")
 		.append(" ORDER BY i.DateAcct, il.Line");

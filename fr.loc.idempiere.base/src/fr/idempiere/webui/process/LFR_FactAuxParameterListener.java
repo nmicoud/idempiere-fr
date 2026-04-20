@@ -25,30 +25,52 @@
 
 package fr.idempiere.webui.process;
 
-import static fr.idempiere.webui.apps.form.WLFRFactExtraitCompte.CTX_LFR_FACT_EXTRAIT_COMPTE_PANEL;
-
 import org.adempiere.webui.apps.IProcessParameterListener;
 import org.adempiere.webui.apps.ProcessParameterPanel;
 import org.adempiere.webui.editor.WEditor;
-import org.compiere.util.Env;
+
+import fr.idempiere.util.LfrFactReconciliationUtil;
+import fr.idempiere.webui.util.LfrProcessParameterListenerUtil;
 
 /**
  *  Mécanismes liés aux process basés sur LFR_FactAux
  *  @author Nicolas Micoud - TGI
  */
-public class LFR_FactGeneExtraitCompteParameterListener implements IProcessParameterListener {
+public class LFR_FactAuxParameterListener extends LfrProcessParameterListenerUtil implements IProcessParameterListener {
 
 	@Override
 	public void onChange(ProcessParameterPanel parameterPanel, String columnName, WEditor editor) {
 
+		if (editor.getColumnName().equals("LFR_Customer_ID")) {
 
-		if (Env.getContext(Env.getCtx(), parameterPanel.getWindowNo(), CTX_LFR_FACT_EXTRAIT_COMPTE_PANEL).equals("")) {
-			if (columnName.equals("LFR_AccountSelection") && editor.getValue() != null) {
-				parameterPanel.getEditor("Account_ID").setValue(null);
-				parameterPanel.getEditorTo("Account_ID").setValue(null);
+			if (editor.getValue() == null)
+				clearParameter(parameterPanel, "LFR_Customer_Acct");
+			else {
+				WEditor fAcctSchema = parameterPanel.getEditor("C_AcctSchema_ID");
+
+				if (fAcctSchema != null && !fAcctSchema.isNullOrEmpty())
+					parameterPanel.getEditor("LFR_Customer_Acct").setValue(LfrFactReconciliationUtil.getCompteAuxiliaireClient(fAcctSchema.getValue(), editor.getValue()));	
 			}
-			else if (columnName.startsWith("Account_ID") && editor.getValue() != null)
-				parameterPanel.getEditor("LFR_AccountSelection").setValue(null);
+		}
+		else if (editor.getColumnName().equals("LFR_Vendor_ID")) {
+
+			if (editor.getValue() == null)
+				clearParameter(parameterPanel, "LFR_Vendor_Acct");
+			else {
+				WEditor fAcctSchema = parameterPanel.getEditor("C_AcctSchema_ID");
+
+				if (fAcctSchema != null && !fAcctSchema.isNullOrEmpty())
+					parameterPanel.getEditor("LFR_Vendor_Acct").setValue(LfrFactReconciliationUtil.getCompteAuxiliaireFournisseur(fAcctSchema.getValue(), editor.getValue()));	
+			}
+		}
+		else if (columnName.equals("IsCustomer") && (Boolean) editor.getValue()) {
+			clearParameter(parameterPanel, "IsVendor");
+			clearParameter(parameterPanel, "IsEmployee");
+			clearParameter(parameterPanel, "LFR_Vendor_Acct");
+		}
+		else if (columnName.equals("IsVendor") && (Boolean) editor.getValue()) {
+			clearParameter(parameterPanel, "IsCustomer");
+			clearParameter(parameterPanel, "LFR_Customer_Acct");
 		}
 	}
 }

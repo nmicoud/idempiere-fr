@@ -31,6 +31,7 @@ import java.io.File;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MPaySelection;
+import org.compiere.process.ProcessInfo;
 import org.compiere.util.Util;
 
 import fr.idempiere.util.LfrPayPrintUtil;
@@ -84,9 +85,15 @@ public class LFR_PaySelectionExport extends LfrProcess
 
 				ps.set_ValueNoCheck(C_PAYSELECTION_LFR_PAYSELECTIONEXPORT, "Y");
 				ps.saveEx();
-				if (processUI != null) {
-					processUI.download(rename && fileWithCorrectName != null ? fileWithCorrectName : currentFile);
-				}
+
+				File fileToDownload = rename && fileWithCorrectName != null ? fileWithCorrectName : currentFile;
+
+				if (processUI != null)
+					processUI.download(fileToDownload);
+
+				ProcessInfo m_pi = getProcessInfo();
+				m_pi.setExportFile(fileToDownload);
+				m_pi.setExportFileExtension(filename.substring(filename.lastIndexOf('.')));
 			}
 			else
 				return "@Error@" + err;

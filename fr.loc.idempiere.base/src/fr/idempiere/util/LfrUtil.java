@@ -33,15 +33,19 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MClient;
 import org.compiere.model.MRole;
 import org.compiere.model.MSysConfig;
+import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.TimeUtil;
@@ -54,6 +58,8 @@ import org.compiere.util.Util;
  */
 
 public class LfrUtil extends Util {
+
+	public static CLogger log = CLogger.getCLogger(LfrUtil.class);
 
 	/** Formatte la date passée en paramètre selon le format défini */
 	public static String formatDate (Properties ctx, int clientID, Object value) {
@@ -143,6 +149,41 @@ public class LfrUtil extends Util {
 			}
 		}
 		return ous.toByteArray();
+	}
+
+	/** Ecrit le String dans un fichier */
+	public static File writeToFile (String sb, String fileName)
+	{
+		File out = null;
+		try
+		{
+			out = new File (fileName);
+			Writer fw = new OutputStreamWriter(new FileOutputStream(out, false), "UTF-8");
+			for (int i = 0; i < sb.length(); i++) {
+				char c = sb.charAt(i);
+				//	after
+				if (c == ';' || c == '}')
+					fw.write (c);
+
+				//	before & after
+				else if (c == '{')
+					fw.write (c);
+				else
+					fw.write (c);
+			}
+			fw.flush ();
+			fw.close ();
+			float size = out.length();
+			size /= 1024;
+			log.info(out.getAbsolutePath() + " - " + size + " kB");
+		}
+		catch (Exception ex)
+		{
+			log.log(Level.SEVERE, fileName, ex);
+			throw new RuntimeException(ex);
+		}
+
+		return out;
 	}
 	
 	/** Ajout du text dans le sb avec séparateur */

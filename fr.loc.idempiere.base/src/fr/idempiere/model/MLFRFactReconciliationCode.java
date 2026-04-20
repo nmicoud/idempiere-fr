@@ -98,7 +98,7 @@ public class MLFRFactReconciliationCode extends X_LFR_FactReconciliationCode
 		return res.toUpperCase();
 	}
 
-	public static synchronized String getCodeNext(int acctSchemaID, String type, int recordID, String trxName) {
+	public static synchronized String getCodeNext(Properties ctx, int acctSchemaID, String type, int recordID, String trxName) {
 		// cf org.compiere.model.MSequence.getDocumentNoFromSeq
 
 		String whereClause = " WHERE C_AcctSchema_ID = ? AND LFR_FactReconciliationType = ? AND Record_ID = ? AND IsActive='Y'";
@@ -152,7 +152,7 @@ public class MLFRFactReconciliationCode extends X_LFR_FactReconciliationCode
 				}
 			}
 			else {
-				MLFRFactReconciliationCode frc = new MLFRFactReconciliationCode(Env.getCtx(), 0, trxName);
+				MLFRFactReconciliationCode frc = new MLFRFactReconciliationCode(ctx, 0, trxName);
 				frc.setC_AcctSchema_ID(acctSchemaID);
 				frc.setLFR_FactReconciliationType(type);
 				frc.setRecord_ID(recordID);

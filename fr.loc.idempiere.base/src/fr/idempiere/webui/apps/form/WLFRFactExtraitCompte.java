@@ -392,7 +392,7 @@ public class WLFRFactExtraitCompte implements IFormController, EventListener<Eve
 			Env.setContext(Env.getCtx(), m_WindowNo, "C_AcctSchema_ID", Env.getContext(Env.getCtx(), Env.C_ACCTSCHEMA_ID));
 			Env.setContext(Env.getCtx(), m_WindowNo, "PostingType", MFactAcct.POSTINGTYPE_Actual);
 			Env.setContext(Env.getCtx(), m_WindowNo, "LFR_LettrageFiltre", "A");
-			// Env.setContext(Env.getCtx(), m_WindowNo, "AD_Org_ID", Env.getContext(Env.getCtx(), Env.USER_ORG)); // FIXME voir v12 récente ou v13
+			Env.setContext(Env.getCtx(), m_WindowNo, "AD_Org_ID", Env.getContext(Env.getCtx(), Env.USER_ORG));
 			
 			String extraitCompteType = getType(scName);
 			
@@ -451,8 +451,10 @@ public class WLFRFactExtraitCompte implements IFormController, EventListener<Eve
 
 		final ProcessInfo pi = dialog.getProcessInfo();
 
-		if (pi.isError())
+		if (pi.isError()) {
+			onSelectProcess(getSelectedMainRecord(), true);
 			Dialog.error(m_WindowNo, "ProcessRunError", pi.getSummary());
+		}
 		else {
 
 			m_instanceMainID = instanceID;	
@@ -578,8 +580,8 @@ public class WLFRFactExtraitCompte implements IFormController, EventListener<Eve
 	private StringBuilder gridContentSql = new StringBuilder("SELECT * FROM T_LFR_Report WHERE AD_PInstance_ID = ? ORDER BY T_LFR_Report_ID");
 	private static ColumnInfo org = new ColumnInfo("Bureau", "LFR_FactAcctOrg", KeyNamePair.class, true, false, "o.AD_Org_ID");
 	private static ColumnInfo dateAcct = new ColumnInfo("Date", "DateAcct", Timestamp.class);
-	private static ColumnInfo glCat = new ColumnInfo("Journal", "PrintName", KeyNamePair.class, true, false, "glc.GL_Category_ID");
-	private static ColumnInfo libelle = new ColumnInfo("Libellé", "Description", String.class);
+	private static ColumnInfo glCat = new ColumnInfo("Journal", "LFR_GLCategoryPrintName", KeyNamePair.class, true, false, "glc.GL_Category_ID");
+	private static ColumnInfo libelle = new ColumnInfo("Libellé", "LFR_FactAcctDescription", String.class);
 	private static ColumnInfo lettrage = new ColumnInfo("Lettrage", "LFR_MatchCode || ' - ' || to_char(LFR_ReconciliationDate, 'DD/MM/YYYY') AS InfoLettrage", String.class);
 	private static ColumnInfo matchCode = new ColumnInfo("Let. code", "LFR_MatchCode", String.class);
 	private static ColumnInfo recDate = new ColumnInfo("Let. date", "LFR_ReconciliationDate", String.class);
@@ -663,11 +665,11 @@ public class WLFRFactExtraitCompte implements IFormController, EventListener<Eve
 		return new ColumnInfo[] {setIdColumn(org, 0), dateAcct, glCat, libelle, matchCode, recDate, amtAcctDr, amtAcctCr, solde};
 	}
 	protected ColumnInfo[] getLayout04() {
-		ColumnInfo document = new ColumnInfo("Libellé", "DocTypeName", KeyNamePair.class, true, false, "DocTypeName");
+		ColumnInfo document = new ColumnInfo("Document", "DocTypeName", KeyNamePair.class, true, false, "DocTypeName");
 		return new ColumnInfo[] {dateAcct, setIdColumn(org, 1), document, libelle, lettrage, amtAcctDr, amtAcctCr, solde};
 	}
 	protected ColumnInfo[] getLayout05() {
-		ColumnInfo document = new ColumnInfo("Libellé", "DocTypeName", KeyNamePair.class, true, false, "DocTypeName");
+		ColumnInfo document = new ColumnInfo("Document", "DocTypeName", KeyNamePair.class, true, false, "DocTypeName");
 		return new ColumnInfo[] {dateAcct, setIdColumn(org, 1), document, libelle, matchCode, recDate, amtAcctDr, amtAcctCr, solde};
 	}
 	

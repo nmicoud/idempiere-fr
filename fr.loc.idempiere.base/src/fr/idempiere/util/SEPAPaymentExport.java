@@ -26,9 +26,15 @@
 package fr.idempiere.util;
 
 import static fr.idempiere.model.SystemIDs_LFR.C_BP_BANKACCOUNT_LFR_ISDEFAULT;
+import static fr.idempiere.model.SystemIDs_LFR.LFR_PAYSELECTION_SEPA_DEBTOR_NAME;
+import static fr.idempiere.model.SystemIDs_LFR.LFR_PAYSELECTION_SEPA_ENDTOENDID_TEMPLATE;
+import static fr.idempiere.model.SystemIDs_LFR.LFR_PAYSELECTION_SEPA_INITIATOR_NAME;
+import static fr.idempiere.model.SystemIDs_LFR.LFR_PAYSELECTION_SEPA_REMITTANCE_PREFIX;
+import static fr.idempiere.model.SystemIDs_LFR.LFR_PAYSELECTION_SEPA_REMITTANCE_TEMPLATE;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,23 +50,25 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.compiere.model.I_C_BankAccount;
-import org.compiere.model.I_C_Invoice;
 import org.compiere.model.MBPBankAccount;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MClient;
 import org.compiere.model.MCurrency;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrg;
 import org.compiere.model.MPaySelection;
 import org.compiere.model.MPaySelectionCheck;
 import org.compiere.model.MPaySelectionLine;
+import org.compiere.model.MSysConfig;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.IBAN;
 import org.compiere.util.PaymentExport;
+import org.compiere.util.TimeUtil;
 import org.compiere.util.Util;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -89,6 +97,7 @@ public class SEPAPaymentExport implements PaymentExport {
 
 	private boolean directDebit = false;
 	private String documentType;
+	private boolean m_isVirtInstantane = false;
 
 	/**************************************************************************
 	 * Export to File
@@ -162,10 +171,17 @@ public class SEPAPaymentExport implements PaymentExport {
 
 		MPaySelection firstPaySelection = new MPaySelection(Env.getCtx(), paySelectionID, null);
 
-		if (firstPaySelection.getAD_Org_ID() != 0)
-			initiatorName = MOrg.get(Env.getCtx(), firstPaySelection.getAD_Org_ID()).getName();
-		else
-			initiatorName = client.getName();
+		m_isVirtInstantane = MSysConfig.getBooleanValue("XXA_PAYSELECTION_SEPA_ALLOW_VIRT_INST", false, firstPaySelection.getAD_Client_ID())
+				&& TimeUtil.isSameDay(firstPaySelection.getPayDate(), new Timestamp(TimeUtil.getToday().getTimeInMillis()));
+
+		initiatorName = MSysConfig.getValue(LFR_PAYSELECTION_SEPA_INITIATOR_NAME, "", client.getAD_Client_ID(), firstPaySelection.getAD_Org_ID());
+
+		if (Util.isEmpty(initiatorName)) {
+			if (firstPaySelection.getAD_Org_ID() != 0)
+				initiatorName = MOrg.get(Env.getCtx(), firstPaySelection.getAD_Org_ID()).getName();
+			else
+				initiatorName = client.getName();
+		}
 
 		int psCurrencyID = MBankAccount.get(Env.getCtx(), firstPaySelection.getC_BankAccount_ID()).getC_Currency_ID();
 		
@@ -209,11 +225,14 @@ public class SEPAPaymentExport implements PaymentExport {
 		Element PmtTpInfElement = document.createElement("PmtTpInf");
 		PmtTpInfElement.appendChild(document.createElement("SvcLvl"))
 					.appendChild(document.createElement("Cd")).setTextContent("SEPA");
+
+		if (m_isVirtInstantane)
+			PmtTpInfElement.appendChild(document.createElement("LclInstrm")).appendChild(document.createElement("Cd")).setTextContent("INST");
 		
 		I_C_BankAccount bankAccount = firstPaySelection.getC_BankAccount();
 		
 		String executionDate = new SimpleDateFormat("yyyy-MM-dd").format(firstPaySelection.getPayDate());
-		String dbtr_Name = MOrg.get(Env.getCtx(), firstPaySelection.getAD_Org_ID()).getName();
+		String dbtr_Name = MSysConfig.getValue(LFR_PAYSELECTION_SEPA_DEBTOR_NAME, MOrg.get(Env.getCtx(), firstPaySelection.getAD_Org_ID()).getName(), firstPaySelection.getAD_Client_ID());
 		String dbtrAcct_IBAN = IBAN.normalizeIBAN(bankAccount.getIBAN());
 		String dbtrAcct_BIC = bankAccount.getC_Bank().getSwiftCode();
 
@@ -398,32 +417,42 @@ public class SEPAPaymentExport implements PaymentExport {
 
 
 		StringBuffer remittanceInformationSB = new StringBuffer();
+		String remittanceInformationTemplate = MSysConfig.getValue(LFR_PAYSELECTION_SEPA_REMITTANCE_TEMPLATE, "", mpp.getAD_Client_ID(), mpp.getAD_Org_ID());
+		String remittanceInformationPrefix = MSysConfig.getValue(LFR_PAYSELECTION_SEPA_REMITTANCE_PREFIX, "", mpp.getAD_Client_ID(), mpp.getAD_Org_ID());
 
 		for (MPaySelectionLine mPaySelectionLine : mPaySelectionLines) {
 			String documentNo = null;
-			I_C_Invoice invoice = mPaySelectionLine.getC_Invoice();
+			MInvoice invoice = mPaySelectionLine.getInvoice();
 			if (invoice != null) {
 				if (remittanceInformationSB.length() != 0) {
-					remittanceInformationSB.append(",");
+					remittanceInformationSB.append(" / ");
 				}
 
-				remittanceInformationSB.append(dateFormat.format(invoice.getDateInvoiced()));
-				remittanceInformationSB.append(" ");
-				documentNo = invoice.getDocumentNo();
-				if (documentNo != null && documentNo.length() > 0) {
-					remittanceInformationSB.append(documentNo);
-				}
-				
-				if (invoice.getPOReference() != null) {
-					if (!Util.isEmpty(invoice.getPOReference())) {
-						remittanceInformationSB.append(" ");
-						remittanceInformationSB.append(invoice.getPOReference());
+				if (!Util.isEmpty(remittanceInformationTemplate))
+					remittanceInformationSB.append(Env.parseVariable(remittanceInformationTemplate, invoice, null, true));
+				else {
+					remittanceInformationSB.append(dateFormat.format(invoice.getDateInvoiced()));
+					remittanceInformationSB.append(" ");
+					documentNo = invoice.getDocumentNo();
+					if (documentNo != null && documentNo.length() > 0) {
+						remittanceInformationSB.append(documentNo);
 					}
+					
+					if (invoice.getPOReference() != null) {
+						if (!Util.isEmpty(invoice.getPOReference())) {
+							remittanceInformationSB.append(" ");
+							remittanceInformationSB.append(invoice.getPOReference());
+						}
+					}
+					remittanceInformationSB.append(" ");
+					remittanceInformationSB.append(NumberFormat.getNumberInstance(Locale.GERMANY).format(invoice.getGrandTotal()));					
 				}
-				remittanceInformationSB.append(" ");
-				remittanceInformationSB.append(NumberFormat.getNumberInstance(Locale.GERMANY).format(invoice.getGrandTotal()));
 			}
 		}
+		
+		if (!Util.isEmpty(remittanceInformationPrefix))
+			remittanceInformationSB.insert(0, remittanceInformationPrefix);
+
 		if (remittanceInformationSB.length() >= 136)
 			return remittanceInformationSB.toString().substring(0, 136) + " u.a.";
 
@@ -435,11 +464,18 @@ public class SEPAPaymentExport implements PaymentExport {
 		StringBuilder endToEndID = new StringBuilder();
 		MPaySelectionLine[] mPaySelectionLines = mpp.getPaySelectionLines(true);
 
+		String endToEndIdTemplate = MSysConfig.getValue(LFR_PAYSELECTION_SEPA_ENDTOENDID_TEMPLATE, "", mpp.getAD_Client_ID(), mpp.getAD_Org_ID());
+
 		for (MPaySelectionLine mPaySelectionLine : mPaySelectionLines) {
 			String documentNo = null;
-			I_C_Invoice invoice = mPaySelectionLine.getC_Invoice();
+			MInvoice invoice = mPaySelectionLine.getInvoice();
 			if (invoice != null) {
-				documentNo = invoice.getDocumentNo();
+				
+				if (!Util.isEmpty(endToEndIdTemplate))
+					documentNo = Env.parseVariable(endToEndIdTemplate, invoice, null, true);
+				else
+					documentNo = invoice.getDocumentNo();
+
 				if (documentNo != null && documentNo.length() > 0) {
 					endToEndID.append(documentNo);
 					endToEndID.append("/");
@@ -514,7 +550,10 @@ public class SEPAPaymentExport implements PaymentExport {
 
 	@Override
 	public String getFilenamePrefix() {
-		String creationDate = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(System.currentTimeMillis()) ;
+		String creationDate = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(System.currentTimeMillis());
+		if (m_isVirtInstantane)
+			creationDate += "-INST";
+
 		return "SEPA-" + creationDate ;
 	}
 

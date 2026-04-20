@@ -97,12 +97,8 @@ public class LfrFactReconciliationUtil {
 //		String sql = "SELECT fa.Account_ID, fa.AD_Table_ID, fa.Record_ID, fa.Line_ID, fa.C_BPartner_ID" 
 //				+ " FROM Fact_Acct fa"
 //				+ " WHERE Fact_Acct_ID = " + Fact_Acct_ID;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
 
 		try {
-//			pstmt = DB.prepareStatement(sql, trxName);
-//			rs = pstmt.executeQuery ();
 			ArrayList<MAllocationHdr> allocs = new ArrayList<MAllocationHdr>();
 			ArrayList<Object> docs = new ArrayList<Object>();
 
@@ -173,9 +169,7 @@ public class LfrFactReconciliationUtil {
 			e.printStackTrace();
 			return -1;
 		}
-		finally {
-			DB.close(rs, pstmt);
-		}
+
 		return nbLettrees;
 	}	// LettrageFactAcct
 	
@@ -390,7 +384,7 @@ public class LfrFactReconciliationUtil {
 		DB.executeUpdateEx(sql, trxName);
 		s_log.log(Level.FINE, "Inserted " + retvalue + " new facts into Fact_Reconciliation");
 
-		String matchCode = MLFRFactReconciliationCode.getCodeNext(acctSchemaID, lettrageType, recordID, trxName);
+		String matchCode = MLFRFactReconciliationCode.getCodeNext(ctx, acctSchemaID, lettrageType, recordID, trxName);
 		sql = "UPDATE Fact_Reconciliation "
 				+ "SET MatchCode = '" + matchCode + "'" 
 				+ ", LFR_ReconciliationDate =" + DB.TO_DATE(dateLettrage, true) 
@@ -409,7 +403,7 @@ public class LfrFactReconciliationUtil {
 	/**
 	 * Identifie le tiers de l'affectation ; le même tiers doit figurer sur toutes les lignes
 	 **/
-	private static int getAllocBPartnerID(Properties ctx, MAllocationHdr alloc, String trxName) {
+	public static int getAllocBPartnerID(Properties ctx, MAllocationHdr alloc, String trxName) {
 		MAllocationLine[] lines = alloc.getLines(true);
 
 		ArrayList<Integer> listBP = new ArrayList<Integer>();
@@ -525,25 +519,31 @@ public class LfrFactReconciliationUtil {
 
 		return no;
 	}	//	supprLettrage
-	
+
 	/**
-	 * 	Le document a-t-il des écritures qui sont lettrées ?
+	 * 	Renvoie le code lettrage de l'écriture ?
 	 *	@return MatchCode
 	 */
-	private static String getMatchCodeOfFactAcct(MFactAcct fa, String trxName)
-	{
+	private static String getMatchCodeOfFactAcct(MFactAcct fa, String trxName) {
+		return getMatchCodeOfFactAcct(fa.getC_AcctSchema_ID(), fa.getAD_Table_ID(), fa.getRecord_ID(), fa.getLine_ID(), fa.getAccount_ID(), trxName);
+	}
+
+	/**
+	 * 	Les écritures liées au document sont-elles lettrées ?
+	 *	@return MatchCode
+	 */
+	public static String getMatchCodeOfFactAcct(int acctSchemaID, int tableID, int recordID, int lineID, int accountID, String trxName) {
 		StringBuilder sql = new StringBuilder("SELECT l.MatchCode FROM Fact_Acct fa") 
 				.append(" INNER JOIN Fact_Reconciliation l ON (fa.Fact_Acct_ID = l.Fact_Acct_ID)") 
-				.append(" WHERE fa.AD_Table_ID = ").append(fa.getAD_Table_ID()) 
-				.append(" AND fa.Record_ID = ").append(fa.getRecord_ID());
-		
-		sql.append(" AND fa.C_AcctSchema_ID = ").append(fa.getC_AcctSchema_ID());
-		
-		if (fa.getLine_ID() > 0)
-			sql.append(" AND fa.Line_ID = ").append(fa.getLine_ID());
-		if (fa.getAccount_ID() > 0)
-			sql.append(" AND fa.Account_ID = ").append(fa.getAccount_ID());
-		
+				.append(" AND fa.C_AcctSchema_ID = ").append(acctSchemaID)
+				.append(" WHERE fa.AD_Table_ID = ").append(tableID)
+				.append(" AND fa.Record_ID = ").append(recordID);
+
+		if (lineID > 0)
+			sql.append(" AND fa.Line_ID = ").append(lineID);
+		if (accountID > 0)
+			sql.append(" AND fa.Account_ID = ").append(accountID);
+
 		String matchcode = DB.getSQLValueString(trxName, sql.toString());
 		return matchcode;
 	}
@@ -554,5 +554,25 @@ public class LfrFactReconciliationUtil {
 
 	public static int getCompteAuxiliaireFournisseur(Object acctSchemaID, Object bpartnerID) {
 		return DB.getSQLValueEx(null, "SELECT vc.Account_ID FROM C_BP_Vendor_Acct bpa, C_ValidCombination vc WHERE bpa.V_Liability_Acct = vc.C_ValidCombination_ID AND bpa.C_AcctSchema_ID = ? AND bpa.C_BPartner_ID = ?", acctSchemaID, bpartnerID);
+	}
+
+
+	/** Renvoie la liste des écritures comptables liées à une affectation */
+	public static int[] getAllocationRelatedFactAcctIDs(int allocationHdrID, int bpartnerID) {
+
+		MAllocationHdr alloc = new MAllocationHdr(Env.getCtx(), allocationHdrID, null);
+
+		ArrayList<MAllocationHdr> allocs = new ArrayList<MAllocationHdr>();
+		ArrayList<Object> docs = new ArrayList<Object>();
+		allocs.add(alloc);
+
+		LfrFactReconciliationUtil.getDocumentsAndOtherAllocations(Env.getCtx(), bpartnerID, allocs, docs, null);
+
+		if (allocs.size() > 0 && docs.size() > 0) {
+			String sqlWhereFact = LfrFactReconciliationUtil.getSQLWhereForFactAcct(allocs, docs) + " AND EXISTS (SELECT 1 FROM Fact_Reconciliation l WHERE l.Fact_Acct_ID = Fact_Acct.Fact_Acct_ID)";
+			return DB.getIDsEx(null, "SELECT Fact_Acct_ID FROM Fact_Acct WHERE " + sqlWhereFact);
+		}
+
+		return null;
 	}
 }

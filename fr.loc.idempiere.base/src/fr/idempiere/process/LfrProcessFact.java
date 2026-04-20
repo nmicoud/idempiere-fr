@@ -25,6 +25,8 @@
 
 package fr.idempiere.process;
 
+import static fr.idempiere.model.SystemIDs_LFR.LFR_REPORT_FACT_TITLE_PREFIX;
+
 import java.sql.Timestamp;
 
 import org.compiere.model.MAcctSchema;
@@ -33,6 +35,7 @@ import org.compiere.model.MCurrency;
 import org.compiere.model.MDocType;
 import org.compiere.model.MGLCategory;
 import org.compiere.model.MOrg;
+import org.compiere.model.MSysConfig;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
@@ -81,7 +84,7 @@ public abstract class LfrProcessFact extends LfrProcess {
 	}	//	prepare
 
 	protected String getTitlePrefix() {
-		return "LFR ";
+		return MSysConfig.getValue(LFR_REPORT_FACT_TITLE_PREFIX, "", getAD_Client_ID());
 	}
 
 	protected String getTitleSuffix() {

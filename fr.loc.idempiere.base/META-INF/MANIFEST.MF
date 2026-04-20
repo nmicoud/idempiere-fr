@@ -2,18 +2,26 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: iDempiere France Specifics Base
 Bundle-SymbolicName: fr.loc.idempiere.base;singleton:=true
-Bundle-Version: 10.0.0.qualifier
-Bundle-ClassPath: .
 Bundle-Vendor: LFR
-Automatic-Module-Name: fr.loc.idempiere.base
-Bundle-RequiredExecutionEnvironment: JavaSE-11
-Bundle-ActivationPolicy: lazy
-Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
- org.adempiere.plugin.utils;bundle-version="10.0.0"
+Bundle-Version: 10.0.0.qualifier
 Export-Package: fr.idempiere.model,
  fr.idempiere.process,
- fr.idempiere.util
-Import-Package: org.osgi.service.event;version="1.4.1"
+ fr.idempiere.util,
+ fr.idempiere.webui.apps.form,
+ fr.idempiere.webui.process,
+ fr.idempiere.webui.util
+Import-Package: org.osgi.service.component.annotations;version="[1.5.0,2.0.0)",
+ org.osgi.service.event;version="1.4.1",
+ org.zkoss.zk.ui.event;version="[10.0.0,11.0.0)"
+Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
+ org.adempiere.base.process;bundle-version="10.0.0",
+ org.adempiere.plugin.utils;bundle-version="10.0.0",
+ org.adempiere.ui.zk,
+ zk;bundle-version="10.0.1",
+ zcommon;bundle-version="10.0.1",
+ zul;bundle-version="10.0.1",
+ org.adempiere.ui
+Automatic-Module-Name: fr.loc.idempiere.base
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/*.xml
-Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version>=11))"
-Bundle-Activator: org.adempiere.plugin.utils.Incremental2PackActivator
