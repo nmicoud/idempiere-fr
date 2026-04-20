@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="fr.idempiere.webui.process.LFR_FactAuxParameterListener">
+   <implementation class="fr.idempiere.webui.process.LFR_FactAuxParameterListener"/>
+   <property name="ProcessClass" type="String" value="fr.idempiere.process.LFR_FactAux"/>
+   <property name="ColumnName" type="String" value="LFR_Customer_ID,LFR_Vendor_ID,IsCustomer,IsVendor"/>
+   <service>
+      <provide interface="org.adempiere.webui.apps.IProcessParameterListener"/>
+   </service>
+</scr:component>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="fr.idempiere.webui.process.LFR_FactGeneExtraitCompteParameterListener">
+   <implementation class="fr.idempiere.webui.process.LFR_FactGeneExtraitCompteParameterListener"/>
+   <property name="ProcessClass" type="String" value="fr.idempiere.process.LFR_FactGeneExtraitCompte"/>
+   <property name="ColumnName" type="String" value="LFR_AccountSelection,Account_ID,Account_ID_2"/>
+   <service>
+      <provide interface="org.adempiere.webui.apps.IProcessParameterListener"/>
+   </service>
+</scr:component>
