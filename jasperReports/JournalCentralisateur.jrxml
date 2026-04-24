@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
+<!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.17.0-6d93193241dd8cc42629e188b94f9e0bc5722efd  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="JournalCentralisateur" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" resourceBundle="localization" uuid="5041eab9-2bc0-41c4-88be-3207a84c1599">
 	<property name="ireport.scriptlethandling" value="0"/>
 	<property name="ireport.encoding" value="UTF-8"/>
@@ -15,7 +15,7 @@
 	<import value="net.sf.jasperreports.engine.data.*"/>
 	<parameter name="AD_PINSTANCE_ID" class="java.lang.Integer"/>
 	<queryString>
-		<![CDATA[SELECT AmtAcctDr, AmtAcctCr, GL_Category_ID, IsSummary, PrintName, ClientName, OrgName, Title, LFR_DateAsString, AccountValue, Account_Name
+		<![CDATA[SELECT AmtAcctDr, AmtAcctCr, GL_Category_ID, IsSummary, LFR_GLCategoryPrintName, ClientName, OrgName, Title, LFR_DateAsString, AccountValue, Account_Name
 FROM T_LFR_Report
 WHERE AD_PInstance_ID = $P{AD_PINSTANCE_ID}
 ORDER BY Line]]>
@@ -24,7 +24,7 @@ ORDER BY Line]]>
 	<field name="AMTACCTCR" class="java.math.BigDecimal"/>
 	<field name="GL_CATEGORY_ID" class="java.math.BigDecimal"/>
 	<field name="ISSUMMARY" class="java.lang.String"/>
-	<field name="PRINTNAME" class="java.lang.String"/>
+	<field name="LFR_GLCATEGORYPRINTNAME" class="java.lang.String"/>
 	<field name="CLIENTNAME" class="java.lang.String"/>
 	<field name="ORGNAME" class="java.lang.String"/>
 	<field name="TITLE" class="java.lang.String"/>
@@ -53,7 +53,7 @@ ORDER BY Line]]>
 					<textElement verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="8" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{PRINTNAME}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{LFR_GLCATEGORYPRINTNAME}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
@@ -201,7 +201,7 @@ ORDER BY Line]]>
 
 ($F{ACCOUNTVALUE} == null ? "" : ($F{ACCOUNTVALUE} + " - ")) + $F{ACCOUNT_NAME}
 :
-$F{PRINTNAME})]]></textFieldExpression>
+$F{LFR_GLCATEGORYPRINTNAME})]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
