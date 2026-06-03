@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MFactAcct;
+import org.compiere.model.MFactReconciliation;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MPayment;
 import org.compiere.model.MSysConfig;
@@ -519,6 +520,20 @@ public class LfrFactReconciliationUtil {
 
 		return no;
 	}	//	supprLettrage
+
+	/*
+	 * Suppression de tout le lettrage attaché au document passé en paramètre
+	 */
+	public static void deleteReconciliation(Properties ctx, int tableID, int recordID, String trxName) {
+
+		Query query = new Query(ctx, MFactReconciliation.Table_Name, "Fact_Acct_ID IN (SELECT fa.Fact_Acct_ID FROM Fact_Acct fa WHERE fa.AD_Table_ID = ? AND fa.Record_ID = ?)", trxName)
+				.setParameters(tableID, recordID);
+
+		List<MFactReconciliation> list = query.list();
+
+		for (MFactReconciliation fr : list)
+			fr.deleteEx(true);
+	}
 
 	/**
 	 * 	Renvoie le code lettrage de l'écriture ?

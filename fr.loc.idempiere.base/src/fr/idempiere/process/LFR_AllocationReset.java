@@ -33,7 +33,7 @@ import org.compiere.util.Env;
 import fr.idempiere.util.LfrFactReconciliationUtil;
 
 /**
- *	Process de lettrage des écritures comptables
+ *	Process qui surcharge AllocationReset en supprimant le lettrage de l'affectation
  *  @author Nicolas Micoud - TGI
  */
 
